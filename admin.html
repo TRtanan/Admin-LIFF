@@ -1,13 +1,25 @@
 <!doctype html>
 <html lang="th">
+
 <head>
+
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
 <title>E-CHA Admin</title>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <style>
+
+*{
+  box-sizing:border-box;
+}
+
 body{
   font-family:Arial,sans-serif;
   background:#f4f6f8;
@@ -26,6 +38,7 @@ body{
   justify-content:space-between;
   align-items:center;
   margin-bottom:18px;
+  gap:12px;
 }
 
 .brand{
@@ -33,11 +46,17 @@ body{
   font-weight:700;
 }
 
+.user-info{
+  text-align:right;
+}
+
 .role{
+  display:inline-block;
   padding:6px 10px;
   border-radius:999px;
   background:#e5e7eb;
   font-size:12px;
+  font-weight:600;
 }
 
 .grid{
@@ -74,6 +93,7 @@ body{
   background:#111827;
   color:white;
   cursor:pointer;
+  font-size:14px;
 }
 
 .nav button.secondary{
@@ -81,12 +101,17 @@ body{
   color:#111827;
 }
 
+.nav button:hover,
+.action:hover{
+  opacity:.9;
+}
+
 .section{
   margin-top:16px;
 }
 
 .hidden{
-  display:none;
+  display:none !important;
 }
 
 .tablewrap{
@@ -108,23 +133,21 @@ body{
   white-space:nowrap;
 }
 
-.danger{
-  color:#b91c1c;
-}
-
-.ok{
-  color:#047857;
+.table th{
+  background:#f9fafb;
+  font-weight:700;
 }
 
 .muted{
   color:#6b7280;
   font-size:13px;
+  margin-bottom:8px;
 }
 
 .error{
   background:#fee2e2;
   color:#991b1b;
-  padding:10px;
+  padding:12px;
   border-radius:10px;
   margin-bottom:12px;
 }
@@ -132,7 +155,7 @@ body{
 .success{
   background:#dcfce7;
   color:#166534;
-  padding:10px;
+  padding:12px;
   border-radius:10px;
   margin-bottom:12px;
 }
@@ -140,18 +163,55 @@ body{
 .loading{
   background:#fef3c7;
   color:#92400e;
-  padding:10px;
+  padding:12px;
   border-radius:10px;
   margin-bottom:12px;
 }
 
+.info-box{
+  background:#fff;
+  border-radius:12px;
+  padding:12px;
+  margin:12px 0;
+  box-shadow:0 1px 5px #0000000d;
+}
+
+.period-status{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:12px;
+  background:#e5e7eb;
+}
+
+select,
 input{
   width:100%;
-  box-sizing:border-box;
   padding:10px;
   margin:6px 0 12px;
   border:1px solid #ddd;
   border-radius:8px;
+  background:#fff;
+  font-size:14px;
+}
+
+.button-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+.danger{
+  background:#991b1b !important;
+}
+
+.warning{
+  background:#92400e !important;
+}
+
+.green{
+  background:#047857 !important;
 }
 
 button:disabled{
@@ -160,18 +220,25 @@ button:disabled{
 }
 
 @media(max-width:800px){
+
   .grid{
     grid-template-columns:repeat(2,1fr);
   }
+
 }
 
 @media(max-width:500px){
+
   .wrap{
     padding:12px;
   }
 
   .brand{
     font-size:21px;
+  }
+
+  .top{
+    align-items:flex-start;
   }
 
   .grid{
@@ -189,74 +256,144 @@ button:disabled{
 
   .nav button,
   .action{
-    padding:9px 12px;
+    padding:9px 11px;
   }
+
 }
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="wrap">
 
-  <!-- MESSAGE -->
+
+  <!-- ==================================================
+       MESSAGE
+       ================================================== -->
+
   <div id="error"></div>
 
-  <!-- HEADER -->
-  <div class="top">
-    <div class="brand">E-CHA ADMIN</div>
 
-    <div>
-      <span id="name"></span>
-      <span id="role" class="role">...</span>
+  <!-- ==================================================
+       HEADER
+       ================================================== -->
+
+  <div class="top">
+
+    <div class="brand">
+      E-CHA ADMIN
     </div>
+
+    <div class="user-info">
+
+      <div id="name">
+      </div>
+
+      <span
+        id="role"
+        class="role">
+        ...
+      </span>
+
+    </div>
+
   </div>
 
 
-  <!-- DASHBOARD -->
+  <!-- ==================================================
+       DASHBOARD
+       ================================================== -->
+
   <div class="grid">
 
     <div class="card">
+
       พนักงาน Active
-      <div id="active" class="num">-</div>
+
+      <div
+        id="active"
+        class="num">
+        -
+      </div>
+
     </div>
 
+
     <div class="card">
+
       ทำงานวันนี้
-      <div id="working" class="num">-</div>
+
+      <div
+        id="working"
+        class="num">
+        -
+      </div>
+
     </div>
 
+
     <div class="card">
+
       ยังไม่ Clock-out
-      <div id="missing" class="num">-</div>
+
+      <div
+        id="missing"
+        class="num">
+        -
+      </div>
+
     </div>
 
+
     <div class="card">
+
       มาสายวันนี้
-      <div id="late" class="num">-</div>
+
+      <div
+        id="late"
+        class="num">
+        -
+      </div>
+
     </div>
 
   </div>
 
 
-  <!-- NAVIGATION -->
+  <!-- ==================================================
+       NAVIGATION
+       ================================================== -->
+
   <div class="nav">
 
-    <button onclick="show('attendance')">
+    <button
+      onclick="show('attendance')">
       🕐 Attendance
     </button>
 
-    <button onclick="show('employees')">
+
+    <button
+      onclick="show('employees')">
       👥 Employees
     </button>
 
-    <button onclick="show('payroll')">
+
+    <button
+      onclick="show('payroll')">
       💰 Payroll
     </button>
 
-    <button onclick="show('audit')">
+
+    <button
+      onclick="show('audit')">
       📋 Audit Log
     </button>
+
 
     <button
       id="adminBtn"
@@ -268,126 +405,214 @@ button:disabled{
   </div>
 
 
-  <!-- ATTENDANCE -->
-  <section id="attendance" class="section hidden">
+  <!-- ==================================================
+       ATTENDANCE
+       ================================================== -->
 
-    <h2>Attendance</h2>
+  <section
+    id="attendance"
+    class="section hidden">
+
+    <h2>
+      Attendance
+    </h2>
 
     <div class="muted">
-      แสดง Daily_Attendance
+      แสดง Daily_Attendance ของวันที่เลือก
     </div>
+
 
     <input
       id="attDate"
       type="date"
-      aria-label="เลือกวันที่ Attendance"
     >
 
-    <button
-      class="action"
-      onclick="loadAttendance()">
-      Refresh
-    </button>
+
+    <div class="button-row">
+
+      <button
+        class="action"
+        onclick="loadAttendance()">
+        🔄 Refresh
+      </button>
+
+    </div>
+
 
     <div
       id="attTable"
-      class="tablewrap"
-      style="margin-top:12px">
+      class="tablewrap">
     </div>
 
   </section>
 
 
-  <!-- EMPLOYEES -->
-  <section id="employees" class="section hidden">
+  <!-- ==================================================
+       EMPLOYEES
+       ================================================== -->
 
-    <h2>Employees</h2>
+  <section
+    id="employees"
+    class="section hidden">
 
-    <button
-      class="action"
-      onclick="loadEmployees()">
-      Refresh
-    </button>
+    <h2>
+      Employees
+    </h2>
+
+
+    <div class="button-row">
+
+      <button
+        class="action"
+        onclick="loadEmployees()">
+        🔄 Refresh
+      </button>
+
+    </div>
+
 
     <div
       id="empTable"
-      class="tablewrap"
-      style="margin-top:12px">
+      class="tablewrap">
     </div>
 
   </section>
 
 
-  <!-- PAYROLL -->
-  <section id="payroll" class="section hidden">
+  <!-- ==================================================
+       PAYROLL
+       ================================================== -->
 
-    <h2>Payroll</h2>
+  <section
+    id="payroll"
+    class="section hidden">
 
-    <input
-      id="period"
-      type="text"
-      placeholder="เช่น 2026-09-B"
-      autocomplete="off"
-    >
+    <h2>
+      Payroll
+    </h2>
 
-    <button
-      class="action"
-      onclick="loadPayroll()">
-      Load
-    </button>
+
+    <div class="muted">
+      เลือก Payroll Period จาก Payroll_Periods
+    </div>
+
+
+    <select
+      id="period">
+
+      <option value="">
+        -- เลือก Payroll Period --
+      </option>
+
+    </select>
+
+
+    <div
+      id="periodInfo">
+    </div>
+
+
+    <div class="button-row">
+
+      <button
+        class="action"
+        onclick="loadPayroll()">
+        📊 Load Payroll
+      </button>
+
+
+      <button
+        class="action green"
+        onclick="recalculatePayroll()">
+        🔄 Recalculate
+      </button>
+
+    </div>
+
 
     <div
       id="payTable"
-      class="tablewrap"
-      style="margin-top:12px">
+      class="tablewrap">
     </div>
 
   </section>
 
 
-  <!-- AUDIT -->
-  <section id="audit" class="section hidden">
+  <!-- ==================================================
+       AUDIT LOG
+       ================================================== -->
 
-    <h2>Audit Log</h2>
+  <section
+    id="audit"
+    class="section hidden">
 
-    <button
-      class="action"
-      onclick="loadAudit()">
-      Refresh
-    </button>
+    <h2>
+      Audit Log
+    </h2>
+
+
+    <div class="button-row">
+
+      <button
+        class="action"
+        onclick="loadAudit()">
+        🔄 Refresh
+      </button>
+
+    </div>
+
 
     <div
       id="auditTable"
-      class="tablewrap"
-      style="margin-top:12px">
+      class="tablewrap">
     </div>
 
   </section>
 
 
-  <!-- ADMINS -->
-  <section id="admins" class="section hidden">
+  <!-- ==================================================
+       ADMINS
+       ================================================== -->
 
-    <h2>Admins</h2>
+  <section
+    id="admins"
+    class="section hidden">
 
-    <button
-      class="action"
-      onclick="loadAdmins()">
-      Refresh
-    </button>
+    <h2>
+      Admins
+    </h2>
+
+
+    <div class="muted">
+      เฉพาะ SUPER_ADMIN
+    </div>
+
+
+    <div class="button-row">
+
+      <button
+        class="action"
+        onclick="loadAdmins()">
+        🔄 Refresh
+      </button>
+
+    </div>
+
 
     <div
       id="adminTable"
-      class="tablewrap"
-      style="margin-top:12px">
+      class="tablewrap">
     </div>
 
   </section>
+
 
 </div>
 
 
+
 <script>
+
 
 /* =====================================================
    CONFIG
@@ -404,20 +629,26 @@ const CONFIG = {
 };
 
 
+
 /* =====================================================
    GLOBAL
    ===================================================== */
 
 let idToken = '';
+
 let role = '';
+
 let adminName = '';
+
 
 
 /* =====================================================
    HELPER
    ===================================================== */
 
-const $ = id => document.getElementById(id);
+const $ =
+  id => document.getElementById(id);
+
 
 
 /* =====================================================
@@ -426,20 +657,25 @@ const $ = id => document.getElementById(id);
 
 function esc(value){
 
-  return String(value ?? '').replace(
+  return String(
+    value ?? ''
+  ).replace(
     /[&<>"']/g,
 
     char => ({
+
       '&':'&amp;',
       '<':'&lt;',
       '>':'&gt;',
       '"':'&quot;',
       "'":'&#39;'
+
     }[char])
 
   );
 
 }
+
 
 
 /* =====================================================
@@ -456,8 +692,11 @@ function clearMessage(){
 function showError(message){
 
   $('error').innerHTML =
+
     '<div class="error">' +
+
     esc(message) +
+
     '</div>';
 
 }
@@ -466,51 +705,97 @@ function showError(message){
 function showSuccess(message){
 
   $('error').innerHTML =
+
     '<div class="success">' +
+
     esc(message) +
+
     '</div>';
 
 }
 
 
-function showLoading(message='กำลังโหลด...'){
+function showLoading(message){
 
   $('error').innerHTML =
+
     '<div class="loading">' +
-    esc(message) +
+
+    esc(
+      message ||
+      'กำลังโหลด...'
+    ) +
+
     '</div>';
 
 }
+
 
 
 /* =====================================================
-   DATE
+   BANGKOK DATE
    ===================================================== */
-
-/*
-  ใช้เวลา Asia/Bangkok
-  ไม่ใช้ toISOString() เพราะ toISOString()
-  เป็น UTC และอาจทำให้วันที่คลาดเคลื่อน
-*/
 
 function getBangkokDate(){
 
-  const now = new Date();
+  try{
 
-  const formatter =
-    new Intl.DateTimeFormat(
-      'en-CA',
-      {
-        timeZone:'Asia/Bangkok',
-        year:'numeric',
-        month:'2-digit',
-        day:'2-digit'
-      }
+    const formatter =
+      new Intl.DateTimeFormat(
+        'en-CA',
+        {
+          timeZone:
+            'Asia/Bangkok',
+
+          year:
+            'numeric',
+
+          month:
+            '2-digit',
+
+          day:
+            '2-digit'
+        }
+      );
+
+    return formatter.format(
+      new Date()
     );
 
-  return formatter.format(now);
+  }catch(error){
+
+    /*
+      Fallback
+    */
+
+    const now =
+      new Date();
+
+    const y =
+      now.getFullYear();
+
+    const m =
+      String(
+        now.getMonth()+1
+      ).padStart(
+        2,
+        '0'
+      );
+
+    const d =
+      String(
+        now.getDate()
+      ).padStart(
+        2,
+        '0'
+      );
+
+    return `${y}-${m}-${d}`;
+
+  }
 
 }
+
 
 
 /* =====================================================
@@ -523,9 +808,16 @@ async function init(){
 
     clearMessage();
 
+
+    /* -----------------------------------------------
+       CHECK CONFIG
+       ----------------------------------------------- */
+
     if(
       !CONFIG.LIFF_ID ||
-      CONFIG.LIFF_ID.includes('PUT_')
+      CONFIG.LIFF_ID.includes(
+        'PUT_'
+      )
     ){
 
       throw new Error(
@@ -534,9 +826,12 @@ async function init(){
 
     }
 
+
     if(
       !CONFIG.API_URL ||
-      CONFIG.API_URL.includes('PUT_')
+      CONFIG.API_URL.includes(
+        'PUT_'
+      )
     ){
 
       throw new Error(
@@ -547,11 +842,14 @@ async function init(){
 
 
     /* -----------------------------------------------
-       LIFF INIT
+       LIFF
        ----------------------------------------------- */
 
     await liff.init({
-      liffId: CONFIG.LIFF_ID
+
+      liffId:
+        CONFIG.LIFF_ID
+
     });
 
 
@@ -559,7 +857,9 @@ async function init(){
        LOGIN
        ----------------------------------------------- */
 
-    if(!liff.isLoggedIn()){
+    if(
+      !liff.isLoggedIn()
+    ){
 
       liff.login();
 
@@ -572,7 +872,9 @@ async function init(){
        ID TOKEN
        ----------------------------------------------- */
 
-    idToken = liff.getIDToken();
+    idToken =
+      liff.getIDToken();
+
 
     if(!idToken){
 
@@ -584,13 +886,18 @@ async function init(){
 
 
     /* -----------------------------------------------
-       DASHBOARD
+       CHECK ADMIN
        ----------------------------------------------- */
 
-    showLoading('กำลังตรวจสอบสิทธิ์ Admin...');
+    showLoading(
+      'กำลังตรวจสอบสิทธิ์ Admin...'
+    );
 
-    const d =
-      await api('DASHBOARD');
+
+    const dashboard =
+      await api(
+        'DASHBOARD'
+      );
 
 
     /* -----------------------------------------------
@@ -598,44 +905,56 @@ async function init(){
        ----------------------------------------------- */
 
     role =
-      String(d.role || '').toUpperCase();
+      String(
+        dashboard.role ||
+        ''
+      ).toUpperCase();
+
 
     adminName =
-      d.adminName ||
-      d.name ||
+      dashboard.adminName ||
+      dashboard.name ||
       'Admin';
 
 
     $('role').textContent =
       role || 'ADMIN';
 
+
     $('name').textContent =
       adminName;
 
 
     /* -----------------------------------------------
-       ADMIN BUTTON
+       ADMIN MENU
        ----------------------------------------------- */
 
-    if(role !== 'SUPER_ADMIN'){
+    if(
+      role !== 'SUPER_ADMIN'
+    ){
 
-      $('adminBtn').style.display =
+      $('adminBtn')
+        .style
+        .display =
         'none';
 
     }else{
 
-      $('adminBtn').style.display =
+      $('adminBtn')
+        .style
+        .display =
         '';
 
     }
 
 
     /* -----------------------------------------------
-       DASHBOARD DATA
+       DASHBOARD
        ----------------------------------------------- */
 
     renderDashboard(
-      d.data || {}
+      dashboard.data ||
+      {}
     );
 
 
@@ -643,16 +962,41 @@ async function init(){
 
 
     /* -----------------------------------------------
-       DEFAULT SECTION
+       DEFAULT DATE
        ----------------------------------------------- */
 
-    show('attendance');
+    /*
+      ตั้งวันที่เฉพาะหลัง Login สำเร็จ
+      และใช้ Bangkok date
+    */
+
+    const attDate =
+      $('attDate');
+
+    if(
+      attDate &&
+      !attDate.value
+    ){
+
+      attDate.value =
+        getBangkokDate();
+
+    }
+
+
+    /* -----------------------------------------------
+       DEFAULT PAGE
+       ----------------------------------------------- */
+
+    show(
+      'attendance'
+    );
 
 
   }catch(error){
 
     console.error(
-      'Admin Init Error:',
+      'ADMIN INIT ERROR',
       error
     );
 
@@ -664,6 +1008,7 @@ async function init(){
   }
 
 }
+
 
 
 /* =====================================================
@@ -682,6 +1027,7 @@ async function api(
     );
 
   }
+
 
   if(!idToken){
 
@@ -712,7 +1058,9 @@ async function api(
     await fetch(
       CONFIG.API_URL,
       {
-        method:'POST',
+
+        method:
+          'POST',
 
         headers:{
           'Content-Type':
@@ -738,22 +1086,25 @@ async function api(
   }
 
 
-  const text =
+  const responseText =
     await response.text();
 
 
   let data;
 
+
   try{
 
     data =
-      JSON.parse(text);
+      JSON.parse(
+        responseText
+      );
 
   }catch(error){
 
     console.error(
-      'Invalid JSON:',
-      text
+      'INVALID JSON',
+      responseText
     );
 
     throw new Error(
@@ -778,25 +1129,36 @@ async function api(
 }
 
 
+
 /* =====================================================
    DASHBOARD
    ===================================================== */
 
-function renderDashboard(data){
+function renderDashboard(
+  data
+){
 
   $('active').textContent =
-    data.activeEmployees ?? '-';
+    data.activeEmployees ??
+    '-';
+
 
   $('working').textContent =
-    data.workingToday ?? '-';
+    data.workingToday ??
+    '-';
+
 
   $('missing').textContent =
-    data.missingClockOut ?? '-';
+    data.missingClockOut ??
+    '-';
+
 
   $('late').textContent =
-    data.lateToday ?? '-';
+    data.lateToday ??
+    '-';
 
 }
+
 
 
 /* =====================================================
@@ -806,20 +1168,26 @@ function renderDashboard(data){
 function show(id){
 
   document
-    .querySelectorAll('section')
+    .querySelectorAll(
+      'section'
+    )
     .forEach(
       section =>
-        section.classList.add('hidden')
+        section.classList.add(
+          'hidden'
+        )
     );
 
 
   const target =
     $(id);
 
+
   if(!target){
 
     showError(
-      'ไม่พบ Section: ' + id
+      'ไม่พบ Section: ' +
+      id
     );
 
     return;
@@ -832,44 +1200,68 @@ function show(id){
   );
 
 
-  /*
-    โหลดข้อมูลเฉพาะตอนเปิด Section
-  */
+  /* -----------------------------------------------
+     LOAD DATA
+     ----------------------------------------------- */
 
-  if(id === 'attendance'){
+  if(
+    id === 'attendance'
+  ){
 
     loadAttendance();
 
   }
 
-  if(id === 'employees'){
+
+  if(
+    id === 'employees'
+  ){
 
     loadEmployees();
 
   }
 
-  if(id === 'payroll'){
 
-    clearMessage();
+  if(
+    id === 'payroll'
+  ){
+
+    loadPayrollPeriods();
 
   }
 
-  if(id === 'audit'){
+
+  if(
+    id === 'audit'
+  ){
 
     loadAudit();
 
   }
 
+
   if(
-    id === 'admins' &&
-    role === 'SUPER_ADMIN'
+    id === 'admins'
   ){
 
-    loadAdmins();
+    if(
+      role === 'SUPER_ADMIN'
+    ){
+
+      loadAdmins();
+
+    }else{
+
+      showError(
+        'เฉพาะ SUPER_ADMIN เท่านั้น'
+      );
+
+    }
 
   }
 
 }
+
 
 
 /* =====================================================
@@ -886,18 +1278,22 @@ async function loadAttendance(){
 
 
     const date =
-      $('attDate').value.trim();
+      $('attDate')
+        .value
+        .trim();
 
 
     /*
-      ถ้าไม่มีวันที่
-      ไม่ส่ง date ไป
-      ให้ Backend ใช้วันที่ปัจจุบัน
+      ถ้ามีวันที่ → ส่ง date
+      ถ้าไม่มี → Backend ใช้ default
     */
 
     const payload =
       date
-        ? {date:date}
+        ? {
+            date:
+              date
+          }
         : {};
 
 
@@ -908,9 +1304,12 @@ async function loadAttendance(){
       );
 
 
-    $('attTable').innerHTML =
+    $('attTable')
+      .innerHTML =
       table(
-        d.data || [],
+        d.data ||
+        [],
+
         [
           'employeeId',
           'name',
@@ -932,7 +1331,7 @@ async function loadAttendance(){
   }catch(error){
 
     console.error(
-      'Attendance Error:',
+      'ATTENDANCE ERROR',
       error
     );
 
@@ -944,6 +1343,7 @@ async function loadAttendance(){
   }
 
 }
+
 
 
 /* =====================================================
@@ -965,9 +1365,12 @@ async function loadEmployees(){
       );
 
 
-    $('empTable').innerHTML =
+    $('empTable')
+      .innerHTML =
       table(
-        d.data || [],
+        d.data ||
+        [],
+
         [
           'employeeId',
           'name',
@@ -987,7 +1390,7 @@ async function loadEmployees(){
   }catch(error){
 
     console.error(
-      'Employees Error:',
+      'EMPLOYEES ERROR',
       error
     );
 
@@ -1001,6 +1404,276 @@ async function loadEmployees(){
 }
 
 
+
+/* =====================================================
+   PAYROLL PERIODS
+   ===================================================== */
+
+async function loadPayrollPeriods(){
+
+  try{
+
+    showLoading(
+      'กำลังโหลด Payroll Periods...'
+    );
+
+
+    const d =
+      await api(
+        'LIST_PAYROLL_PERIODS'
+      );
+
+
+    const select =
+      $('period');
+
+
+    select.innerHTML =
+      '';
+
+
+    const defaultOption =
+      document.createElement(
+        'option'
+      );
+
+
+    defaultOption.value =
+      '';
+
+
+    defaultOption.textContent =
+      '-- เลือก Payroll Period --';
+
+
+    select.appendChild(
+      defaultOption
+    );
+
+
+    const periods =
+      Array.isArray(
+        d.data
+      )
+        ? d.data
+        : [];
+
+
+    periods.forEach(
+      period => {
+
+        const option =
+          document.createElement(
+            'option'
+          );
+
+
+        option.value =
+          period.periodId ||
+          '';
+
+
+        const periodId =
+          period.periodId ||
+          '';
+
+
+        const startDate =
+          period.startDate ||
+          '';
+
+
+        const endDate =
+          period.endDate ||
+          '';
+
+
+        const status =
+          period.status ||
+          '';
+
+
+        option.textContent =
+          `${periodId} | ${startDate} - ${endDate} | ${status}`;
+
+
+        /*
+          เก็บข้อมูลไว้ด้วย
+          เผื่อใช้แสดงรายละเอียด
+        */
+
+        option.dataset.startDate =
+          startDate;
+
+
+        option.dataset.endDate =
+          endDate;
+
+
+        option.dataset.payDate =
+          period.payDate ||
+          '';
+
+
+        option.dataset.status =
+          status;
+
+
+        option.dataset.remark =
+          period.remark ||
+          '';
+
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+
+    $('periodInfo')
+      .innerHTML =
+      '';
+
+
+    clearMessage();
+
+
+  }catch(error){
+
+    console.error(
+      'PAYROLL PERIOD ERROR',
+      error
+    );
+
+    showError(
+      error.message ||
+      String(error)
+    );
+
+  }
+
+}
+
+
+
+/* =====================================================
+   PERIOD CHANGE
+   ===================================================== */
+
+$('period')
+  .addEventListener(
+    'change',
+    function(){
+
+      const option =
+        this.options[
+          this.selectedIndex
+        ];
+
+
+      if(
+        !option ||
+        !option.value
+      ){
+
+        $('periodInfo')
+          .innerHTML =
+          '';
+
+        return;
+
+      }
+
+
+      const status =
+        option.dataset.status ||
+        '';
+
+
+      const statusClass =
+        status === 'Paid'
+          ? 'green'
+          : '';
+
+
+      $('periodInfo')
+        .innerHTML = `
+
+          <div class="info-box">
+
+            <b>
+              Payroll Period
+            </b>
+
+            <div style="margin-top:8px">
+
+              <strong>
+                ${esc(
+                  option.value
+                )}
+              </strong>
+
+            </div>
+
+            <div
+              class="muted"
+              style="margin-top:6px">
+
+              ${esc(
+                option.dataset.startDate ||
+                ''
+              )}
+
+              -
+
+              ${esc(
+                option.dataset.endDate ||
+                ''
+              )}
+
+            </div>
+
+            <div
+              style="margin-top:8px">
+
+              Status:
+
+              <span
+                class="period-status">
+
+                ${esc(
+                  status ||
+                  '-'
+                )}
+
+              </span>
+
+            </div>
+
+            <div
+              class="muted"
+              style="margin-top:6px">
+
+              Pay Date:
+
+              ${esc(
+                option.dataset.payDate ||
+                '-'
+              )}
+
+            </div>
+
+          </div>
+
+        `;
+
+    }
+  );
+
+
+
 /* =====================================================
    PAYROLL
    ===================================================== */
@@ -1010,13 +1683,15 @@ async function loadPayroll(){
   try{
 
     const period =
-      $('period').value.trim();
+      $('period')
+        .value
+        .trim();
 
 
     if(!period){
 
       showError(
-        'กรุณาใส่ Payroll Period เช่น 2026-09-B'
+        'กรุณาเลือก Payroll Period'
       );
 
       return;
@@ -1041,7 +1716,9 @@ async function loadPayroll(){
 
     let html =
       table(
-        d.data || [],
+        d.data ||
+        [],
+
         [
           'payrollId',
           'periodId',
@@ -1052,6 +1729,9 @@ async function loadPayroll(){
           'holidayPay',
           'positionAllowance',
           'attendanceBonus',
+          'incentive',
+          'otherEarning',
+          'deduction',
           'netPay',
           'status'
         ]
@@ -1059,37 +1739,57 @@ async function loadPayroll(){
 
 
     /*
-      SUPER_ADMIN เท่านั้น
-      จึงจะแสดง Approve / Paid
+      SUPER_ADMIN
+      สามารถ Approve / Paid
     */
 
     if(
       role === 'SUPER_ADMIN'
     ){
 
-      html =
-        '<div style="padding:12px">' +
+      html = `
 
-        '<button ' +
-        'class="action" ' +
-        'onclick="approve()">' +
-        'Approve Payroll' +
-        '</button> ' +
+        <div
+          class="info-box">
 
-        '<button ' +
-        'class="action" ' +
-        'onclick="paid()">' +
-        'Mark as Paid' +
-        '</button>' +
+          <div
+            class="button-row">
 
-        '</div>' +
+            <button
+              class="action green"
+              onclick="approve()">
 
-        html;
+              ✅ Approve Payroll
+
+            </button>
+
+
+            <button
+              class="action"
+              onclick="paid()">
+
+              💵 Mark as Paid
+
+            </button>
+
+          </div>
+
+          <div class="muted">
+
+            เฉพาะ SUPER_ADMIN
+            สามารถ Approve และ Mark as Paid
+
+          </div>
+
+        </div>
+
+      ` + html;
 
     }
 
 
-    $('payTable').innerHTML =
+    $('payTable')
+      .innerHTML =
       html;
 
 
@@ -1099,7 +1799,7 @@ async function loadPayroll(){
   }catch(error){
 
     console.error(
-      'Payroll Error:',
+      'PAYROLL ERROR',
       error
     );
 
@@ -1111,6 +1811,87 @@ async function loadPayroll(){
   }
 
 }
+
+
+
+/* =====================================================
+   RECALCULATE PAYROLL
+   ===================================================== */
+
+async function recalculatePayroll(){
+
+  try{
+
+    const period =
+      $('period')
+        .value
+        .trim();
+
+
+    if(!period){
+
+      showError(
+        'กรุณาเลือก Payroll Period ก่อน Recalculate'
+      );
+
+      return;
+
+    }
+
+
+    const confirmed =
+      window.confirm(
+        `ต้องการ Recalculate Payroll งวด ${period} ใช่หรือไม่?`
+      );
+
+
+    if(!confirmed){
+
+      return;
+
+    }
+
+
+    showLoading(
+      `กำลัง Recalculate ${period}...`
+    );
+
+
+    const d =
+      await api(
+        'RECALCULATE_PAYROLL',
+        {
+          periodId:
+            period
+        }
+      );
+
+
+    showSuccess(
+      d.message ||
+      `Recalculate ${period} สำเร็จ`
+    );
+
+
+    await loadPayroll();
+
+
+  }catch(error){
+
+    console.error(
+      'RECALCULATE ERROR',
+      error
+    );
+
+    showError(
+      error.message ||
+      String(error)
+    );
+
+  }
+
+}
+
 
 
 /* =====================================================
@@ -1121,14 +1902,12 @@ async function approve(){
 
   try{
 
-    const period =
-      $('period').value.trim();
-
-
-    if(!period){
+    if(
+      role !== 'SUPER_ADMIN'
+    ){
 
       showError(
-        'กรุณาระบุ Payroll Period'
+        'เฉพาะ SUPER_ADMIN เท่านั้น'
       );
 
       return;
@@ -1136,20 +1915,57 @@ async function approve(){
     }
 
 
+    const period =
+      $('period')
+        .value
+        .trim();
+
+
+    if(!period){
+
+      showError(
+        'กรุณาเลือก Payroll Period'
+      );
+
+      return;
+
+    }
+
+
+    const confirmed =
+      window.confirm(
+        `Approve Payroll ${period} ใช่หรือไม่?`
+      );
+
+
+    if(!confirmed){
+
+      return;
+
+    }
+
+
+    showLoading(
+      `กำลัง Approve ${period}...`
+    );
+
+
     await api(
       'APPROVE_PAYROLL',
       {
+
         periodId:
           period,
 
         reason:
           'Admin Panel'
+
       }
     );
 
 
     showSuccess(
-      'Approve Payroll สำเร็จ'
+      `Approve Payroll ${period} สำเร็จ`
     );
 
 
@@ -1159,7 +1975,7 @@ async function approve(){
   }catch(error){
 
     console.error(
-      'Approve Error:',
+      'APPROVE ERROR',
       error
     );
 
@@ -1171,6 +1987,7 @@ async function approve(){
   }
 
 }
+
 
 
 /* =====================================================
@@ -1181,14 +1998,12 @@ async function paid(){
 
   try{
 
-    const period =
-      $('period').value.trim();
-
-
-    if(!period){
+    if(
+      role !== 'SUPER_ADMIN'
+    ){
 
       showError(
-        'กรุณาระบุ Payroll Period'
+        'เฉพาะ SUPER_ADMIN เท่านั้น'
       );
 
       return;
@@ -1196,9 +2011,45 @@ async function paid(){
     }
 
 
+    const period =
+      $('period')
+        .value
+        .trim();
+
+
+    if(!period){
+
+      showError(
+        'กรุณาเลือก Payroll Period'
+      );
+
+      return;
+
+    }
+
+
+    const confirmed =
+      window.confirm(
+        `Mark as Paid งวด ${period} ใช่หรือไม่?`
+      );
+
+
+    if(!confirmed){
+
+      return;
+
+    }
+
+
+    showLoading(
+      `กำลัง Mark as Paid ${period}...`
+    );
+
+
     await api(
       'MARK_PAID',
       {
+
         periodId:
           period,
 
@@ -1207,12 +2058,13 @@ async function paid(){
 
         reason:
           'Admin Panel'
+
       }
     );
 
 
     showSuccess(
-      'Mark as Paid สำเร็จ'
+      `Mark as Paid ${period} สำเร็จ`
     );
 
 
@@ -1222,7 +2074,7 @@ async function paid(){
   }catch(error){
 
     console.error(
-      'Mark Paid Error:',
+      'MARK PAID ERROR',
       error
     );
 
@@ -1234,6 +2086,7 @@ async function paid(){
   }
 
 }
+
 
 
 /* =====================================================
@@ -1253,14 +2106,18 @@ async function loadAudit(){
       await api(
         'AUDIT_LOG',
         {
-          limit:100
+          limit:
+            100
         }
       );
 
 
-    $('auditTable').innerHTML =
+    $('auditTable')
+      .innerHTML =
       table(
-        d.data || [],
+        d.data ||
+        [],
+
         [
           'timestamp',
           'adminId',
@@ -1280,7 +2137,7 @@ async function loadAudit(){
   }catch(error){
 
     console.error(
-      'Audit Error:',
+      'AUDIT ERROR',
       error
     );
 
@@ -1292,6 +2149,7 @@ async function loadAudit(){
   }
 
 }
+
 
 
 /* =====================================================
@@ -1326,9 +2184,12 @@ async function loadAdmins(){
       );
 
 
-    $('adminTable').innerHTML =
+    $('adminTable')
+      .innerHTML =
       table(
-        d.data || [],
+        d.data ||
+        [],
+
         [
           'adminId',
           'name',
@@ -1345,7 +2206,7 @@ async function loadAdmins(){
   }catch(error){
 
     console.error(
-      'Admins Error:',
+      'ADMINS ERROR',
       error
     );
 
@@ -1357,6 +2218,7 @@ async function loadAdmins(){
   }
 
 }
+
 
 
 /* =====================================================
@@ -1374,70 +2236,90 @@ function table(
   ){
 
     return `
-      <div style="padding:16px">
+
+      <div
+        style="padding:16px">
+
         ไม่มีข้อมูล
+
       </div>
+
     `;
 
   }
 
 
   return `
+
     <table class="table">
 
       <thead>
 
         <tr>
 
-          ${columns
-            .map(
-              column =>
-                '<th>' +
-                esc(column) +
-                '</th>'
-            )
-            .join('')
+          ${
+            columns
+              .map(
+                column =>
+
+                  '<th>' +
+                  esc(column) +
+                  '</th>'
+
+              )
+              .join('')
           }
 
         </tr>
 
       </thead>
 
+
       <tbody>
 
-        ${rows
-          .map(
-            row => `
+        ${
+          rows
+            .map(
+              row => `
 
-              <tr>
+                <tr>
 
-                ${columns
-                  .map(
-                    column =>
-                      '<td>' +
-                      esc(row?.[column]) +
-                      '</td>'
-                  )
-                  .join('')
-                }
+                  ${
+                    columns
+                      .map(
+                        column =>
 
-              </tr>
+                          '<td>' +
 
-            `
-          )
-          .join('')
+                          esc(
+                            row?.[column]
+                          ) +
+
+                          '</td>'
+
+                      )
+                      .join('')
+                  }
+
+                </tr>
+
+              `
+            )
+            .join('')
         }
 
       </tbody>
 
     </table>
+
   `;
 
 }
 
 
+
 /* =====================================================
-   ERROR HANDLER
+   ERROR
    ===================================================== */
 
 function msg(error){
@@ -1446,12 +2328,14 @@ function msg(error){
     error
   );
 
+
   showError(
     error?.message ||
     String(error)
   );
 
 }
+
 
 
 /* =====================================================
@@ -1462,5 +2346,7 @@ init();
 
 </script>
 
+
 </body>
+
 </html>
