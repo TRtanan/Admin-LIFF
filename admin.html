@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>E-CHA Admin</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#1f2937}.wrap{max-width:1100px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-size:24px;font-weight:700}.role{padding:6px 10px;border-radius:999px;background:#e5e7eb;font-size:12px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px #0000000d}.num{font-size:28px;font-weight:700;margin-top:6px}.nav{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.nav button,.action{border:0;border-radius:10px;padding:10px 14px;background:#111827;color:white;cursor:pointer}.nav button.secondary{background:#e5e7eb;color:#111827}.section{margin-top:16px}.hidden{display:none}.tablewrap{overflow:auto;background:#fff;border-radius:14px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left;white-space:nowrap}.danger{color:#b91c1c}.ok{color:#047857}.muted{color:#6b7280;font-size:13px}.error{background:#fee2e2;color:#991b1b;padding:10px;border-radius:10px;margin-bottom:12px}.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center}.modal>div{background:#fff;padding:20px;border-radius:14px;max-width:420px;width:90%}input{width:100%;box-sizing:border-box;padding:10px;margin:6px 0 12px;border:1px solid #ddd;border-radius:8px}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="error"></div>
+  <div class="top"><div class="brand">E-CHA ADMIN</div><div><span id="name"></span> <span id="role" class="role">...</span></div></div>
+  <div class="grid">
+    <div class="card">พนักงาน Active<div id="active" class="num">-</div></div>
+    <div class="card">ทำงานวันนี้<div id="working" class="num">-</div></div>
+    <div class="card">ยังไม่ Clock-out<div id="missing" class="num">-</div></div>
+    <div class="card">มาสายวันนี้<div id="late" class="num">-</div></div>
+  </div>
+  <div class="nav">
+    <button onclick="show('attendance')">🕐 Attendance</button>
+    <button onclick="show('employees')">👥 Employees</button>
+    <button onclick="show('payroll')">💰 Payroll</button>
+    <button onclick="show('audit')">📋 Audit Log</button>
+    <button id="adminBtn" class="secondary" onclick="show('admins')">👑 Admins</button>
+  </div>
+
+  <section id="attendance" class="section hidden"><h2>Attendance</h2><div class="muted">แสดง Daily_Attendance ของวันที่เลือก</div><input id="attDate" type="date"><button class="action" onclick="loadAttendance()">Refresh</button><div id="attTable" class="tablewrap" style="margin-top:12px"></div></section>
+  <section id="employees" class="section hidden"><h2>Employees</h2><div id="empTable" class="tablewrap"></div></section>
+  <section id="payroll" class="section hidden"><h2>Payroll</h2><input id="period" placeholder="เช่น 2026-09-B"><button class="action" onclick="loadPayroll()">Load</button><div id="payTable" class="tablewrap" style="margin-top:12px"></div></section>
+  <section id="audit" class="section hidden"><h2>Audit Log</h2><div id="auditTable" class="tablewrap"></div></section>
+  <section id="admins" class="section hidden"><h2>Admins</h2><div id="adminTable" class="tablewrap"></div></section>
+</div>
+<script>
+const CONFIG={
+  LIFF_ID:'PUT_ADMIN_LIFF_ID_HERE',
+  API_URL:'PUT_APPS_SCRIPT_WEB_APP_URL_HERE'
+};
+let idToken='',role='';
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function init(){
+  try{
+    if(CONFIG.LIFF_ID.includes('PUT_')||CONFIG.API_URL.includes('PUT_')) throw new Error('กรุณาใส่ ADMIN LIFF ID และ Apps Script Web App URL ใน CONFIG');
+    await liff.init({liffId:CONFIG.LIFF_ID});
+    if(!liff.isLoggedIn()){liff.login();return;}
+    idToken=liff.getIDToken();
+    if(!idToken) throw new Error('ไม่พบ LINE ID Token');
+    const d=await api('DASHBOARD');
+    role=d.role; $('role').textContent=role; $('name').textContent='Admin';
+    if(role!=='SUPER_ADMIN') $('adminBtn').style.display='none';
+    renderDashboard(d.data); show('attendance');
+  }catch(e){$('error').innerHTML='<div class="error">'+esc(e.message||e)+'</div>';}
+}
+async function api(action,payload={}){
+  const res=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({requestType:'admin',action,idToken,...payload})});
+  const d=await res.json(); if(!d.ok) throw new Error(d.error||'API Error'); return d;
+}
+function renderDashboard(d){$('active').textContent=d.activeEmployees;$('working').textContent=d.workingToday;$('missing').textContent=d.missingClockOut;$('late').textContent=d.lateToday;}
+function show(id){document.querySelectorAll('section').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');if(id==='attendance')loadAttendance();if(id==='employees')loadEmployees();if(id==='payroll')loadPayroll();if(id==='audit')loadAudit();if(id==='admins'&&role==='SUPER_ADMIN')loadAdmins();}
+async function loadAttendance(){try{const date=$('attDate').value||new Date().toISOString().slice(0,10);$('attDate').value=date;const d=await api('ATTENDANCE',{date});$('attTable').innerHTML=table(d.data,['employeeId','name','type','checkIn','checkOut','hours','basePay','otHours','otPay','status']);}catch(e){msg(e)}}
+async function loadEmployees(){try{const d=await api('EMPLOYEES');$('empTable').innerHTML=table(d.data,['employeeId','name','type','position','salaryRate','positionAllowance','attendanceBonus','status']);}catch(e){msg(e)}}
+async function loadPayroll(){try{const d=await api('PAYROLL',{periodId:$('period').value.trim()});let html=table(d.data,['payrollId','periodId','employeeId','name','basePay','otPay','holidayPay','positionAllowance','attendanceBonus','netPay','status']);if(role==='SUPER_ADMIN'&&$('period').value.trim())html='<div style="padding:12px"><button class="action" onclick="approve()">Approve Payroll</button> <button class="action" onclick="paid()">Mark as Paid</button></div>'+html;$('payTable').innerHTML=html;}catch(e){msg(e)}}
+async function approve(){try{await api('APPROVE_PAYROLL',{periodId:$('period').value.trim(),reason:'Admin Panel'});alert('Approved');loadPayroll();}catch(e){msg(e)}}
+async function paid(){try{await api('MARK_PAID',{periodId:$('period').value.trim(),paymentRef:'',reason:'Admin Panel'});alert('Marked as Paid');loadPayroll();}catch(e){msg(e)}}
+async function loadAudit(){try{const d=await api('AUDIT_LOG',{limit:100});$('auditTable').innerHTML=table(d.data,['timestamp','adminId','adminName','action','targetType','targetId','reason','result']);}catch(e){msg(e)}}
+async function loadAdmins(){try{const d=await api('LIST_ADMINS');$('adminTable').innerHTML=table(d.data,['adminId','name','lineUserId','role','status']);}catch(e){msg(e)}}
+function table(rows,cols){if(!rows.length)return '<div style="padding:16px">ไม่มีข้อมูล</div>';return '<table class="table"><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(r[c])+'</td>').join('')+'</tr>').join('')+'</tbody></table>';}
+function msg(e){$('error').innerHTML='<div class="error">'+esc(e.message||e)+'</div>';}
+init();
+</script>
+</body></html>
