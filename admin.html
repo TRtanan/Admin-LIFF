@@ -1,2352 +1,573 @@
 <!doctype html>
 <html lang="th">
-
 <head>
-
 <meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
->
-
-<title>E-CHA Admin</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>E-CHA Admin V2</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
 <style>
-
-*{
-  box-sizing:border-box;
+:root{
+  --navy:#111827;--navy2:#1f2937;--blue:#284e85;--bg:#f3f5f8;--card:#fff;
+  --text:#172033;--muted:#6b7280;--line:#e5e7eb;--green:#047857;--red:#b91c1c;
+  --amber:#b45309;--shadow:0 6px 24px rgba(15,23,42,.07);--radius:16px;
 }
-
-body{
-  font-family:Arial,sans-serif;
-  background:#f4f6f8;
-  margin:0;
-  color:#1f2937;
-}
-
-.wrap{
-  max-width:1100px;
-  margin:auto;
-  padding:20px;
-}
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:18px;
-  gap:12px;
-}
-
-.brand{
-  font-size:24px;
-  font-weight:700;
-}
-
-.user-info{
-  text-align:right;
-}
-
-.role{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
-  background:#e5e7eb;
-  font-size:12px;
-  font-weight:600;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-}
-
-.card{
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  box-shadow:0 2px 10px #0000000d;
-}
-
-.num{
-  font-size:28px;
-  font-weight:700;
-  margin-top:6px;
-}
-
-.nav{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin:16px 0;
-}
-
-.nav button,
-.action{
-  border:0;
-  border-radius:10px;
-  padding:10px 14px;
-  background:#111827;
-  color:white;
-  cursor:pointer;
-  font-size:14px;
-}
-
-.nav button.secondary{
-  background:#e5e7eb;
-  color:#111827;
-}
-
-.nav button:hover,
-.action:hover{
-  opacity:.9;
-}
-
-.section{
-  margin-top:16px;
-}
-
-.hidden{
-  display:none !important;
-}
-
-.tablewrap{
-  overflow:auto;
-  background:#fff;
-  border-radius:14px;
-}
-
-.table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-.table th,
-.table td{
-  padding:10px;
-  border-bottom:1px solid #eee;
-  text-align:left;
-  white-space:nowrap;
-}
-
-.table th{
-  background:#f9fafb;
-  font-weight:700;
-}
-
-.muted{
-  color:#6b7280;
-  font-size:13px;
-  margin-bottom:8px;
-}
-
-.error{
-  background:#fee2e2;
-  color:#991b1b;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:12px;
-}
-
-.success{
-  background:#dcfce7;
-  color:#166534;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:12px;
-}
-
-.loading{
-  background:#fef3c7;
-  color:#92400e;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:12px;
-}
-
-.info-box{
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
-  margin:12px 0;
-  box-shadow:0 1px 5px #0000000d;
-}
-
-.period-status{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:999px;
-  font-size:12px;
-  background:#e5e7eb;
-}
-
-select,
-input{
-  width:100%;
-  padding:10px;
-  margin:6px 0 12px;
-  border:1px solid #ddd;
-  border-radius:8px;
-  background:#fff;
-  font-size:14px;
-}
-
-.button-row{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-.danger{
-  background:#991b1b !important;
-}
-
-.warning{
-  background:#92400e !important;
-}
-
-.green{
-  background:#047857 !important;
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-@media(max-width:800px){
-
-  .grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-}
-
-@media(max-width:500px){
-
-  .wrap{
-    padding:12px;
-  }
-
-  .brand{
-    font-size:21px;
-  }
-
-  .top{
-    align-items:flex-start;
-  }
-
-  .grid{
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
-  }
-
-  .card{
-    padding:12px;
-  }
-
-  .num{
-    font-size:24px;
-  }
-
-  .nav button,
-  .action{
-    padding:9px 11px;
-  }
-
-}
-
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:flex}
+.sidebar{width:250px;background:var(--navy);color:#fff;position:fixed;inset:0 auto 0 0;padding:20px 14px;z-index:20;overflow:auto}
+.brand{font-weight:800;font-size:22px;letter-spacing:.3px;padding:4px 10px 18px}
+.brand small{display:block;font-size:11px;color:#9ca3af;font-weight:500;margin-top:3px}
+.navgroup{margin-top:8px}
+.navlabel{font-size:10px;text-transform:uppercase;color:#6b7280;padding:12px 10px 6px;letter-spacing:.8px}
+.navbtn{width:100%;border:0;background:transparent;color:#d1d5db;text-align:left;padding:11px 12px;border-radius:11px;margin:2px 0}
+.navbtn:hover,.navbtn.active{background:#253044;color:#fff}
+.navbtn .ico{display:inline-block;width:28px}
+.sidebar .foot{border-top:1px solid #293244;margin-top:16px;padding:14px 10px;color:#9ca3af;font-size:11px}
+.main{margin-left:250px;width:calc(100% - 250px);min-width:0}
+.topbar{height:68px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:10}
+.top-title{font-weight:700;font-size:18px}
+.user{display:flex;align-items:center;gap:9px;font-size:12px}
+.role{padding:6px 10px;border-radius:999px;background:#eef2f7;font-weight:700}
+.menu{display:none;border:0;background:transparent;font-size:24px}
+.content{padding:24px;max-width:1500px;margin:auto}
+.pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.pagehead h1{margin:0;font-size:28px}
+.pagehead p{margin:6px 0 0;color:var(--muted);font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--navy);color:#fff;font-weight:650}
+.btn:hover{filter:brightness(1.08)}
+.btn.secondary{background:#e8ebf0;color:var(--navy)}
+.btn.blue{background:var(--blue)}
+.btn.green{background:var(--green)}
+.btn.red{background:#991b1b}
+.btn.amber{background:#b45309}
+.btn.small{padding:7px 10px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.kpi{min-height:120px}.kpi .label{color:var(--muted);font-size:13px}.kpi .num{font-size:31px;font-weight:800;margin-top:10px}
+.kpi .hint{font-size:11px;color:var(--muted);margin-top:4px}
+.panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-top:16px}
+.panel h3{margin:0 0 12px;font-size:17px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:14px}
+.field{min-width:150px;flex:1}.field.wide{flex:2}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:650}
+input,select,textarea{width:100%;border:1px solid #d9dee7;background:#fff;border-radius:9px;padding:10px 11px;color:var(--text);outline:none}
+input:focus,select:focus,textarea:focus{border-color:#7b9ac5;box-shadow:0 0 0 3px rgba(40,78,133,.09)}
+textarea{min-height:80px;resize:vertical}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:10px 11px;border-bottom:1px solid #edf0f3;text-align:left;white-space:nowrap;font-size:12px}
+th{background:#f8fafc;color:#4b5563;font-weight:750;position:sticky;top:0;z-index:1}
+tr:last-child td{border-bottom:0}
+.status{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:750}
+.status.pending{background:#fff7ed;color:#b45309}.status.approved{background:#ecfdf5;color:#047857}.status.paid{background:#eff6ff;color:#1d4ed8}.status.active{background:#ecfdf5;color:#047857}.status.inactive{background:#f3f4f6;color:#6b7280}
+.muted{color:var(--muted);font-size:12px}.empty{padding:24px;text-align:center;color:var(--muted)}
+.section{display:none}.section.active{display:block}
+.notice{padding:11px 13px;border-radius:10px;background:#eff6ff;color:#1e40af;font-size:12px;margin-bottom:12px}
+.error{padding:11px 13px;border-radius:10px;background:#fef2f2;color:#991b1b;font-size:12px;margin-bottom:12px}
+.success{padding:11px 13px;border-radius:10px;background:#ecfdf5;color:#047857;font-size:12px;margin-bottom:12px}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:18px;width:min(760px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 70px rgba(0,0,0,.25)}
+.modalhead{padding:17px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modalhead h3{margin:0}.close{border:0;background:#f1f3f6;border-radius:9px;width:34px;height:34px}
+.modalbody{padding:18px}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.formgrid .full{grid-column:1/-1}.modalfoot{padding:14px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.statbox{background:#f8fafc;border-radius:12px;padding:13px}.statbox b{display:block;font-size:18px;margin-top:4px}
+.loginbox{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:200}
+.loginbox .card{width:min(460px,100%);text-align:center}.spinner{display:inline-block;width:22px;height:22px;border:3px solid #dbe2ec;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.print-area{background:#fff;padding:28px;border-radius:12px}
+@media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:none}.main{margin-left:0;width:100%}.menu{display:block}.top-title{font-size:16px}}
+@media(max-width:620px){.content{padding:14px}.topbar{padding:0 14px}.grid{grid-template-columns:1fr 1fr;gap:9px}.kpi{padding:14px;min-height:100px}.kpi .num{font-size:25px}.pagehead{display:block}.actions{margin-top:12px}.formgrid{grid-template-columns:1fr}.formgrid .full{grid-column:auto}.statrow{grid-template-columns:1fr}.panel{padding:14px}}
 </style>
-
 </head>
-
-
 <body>
-
-
-<div class="wrap">
-
-
-  <!-- ==================================================
-       MESSAGE
-       ================================================== -->
-
-  <div id="error"></div>
-
-
-  <!-- ==================================================
-       HEADER
-       ================================================== -->
-
-  <div class="top">
-
-    <div class="brand">
-      E-CHA ADMIN
-    </div>
-
-    <div class="user-info">
-
-      <div id="name">
-      </div>
-
-      <span
-        id="role"
-        class="role">
-        ...
-      </span>
-
-    </div>
-
+<div id="loginBox" class="loginbox">
+  <div class="card">
+    <div style="font-size:42px">🔐</div>
+    <h2>E-CHA ADMIN</h2>
+    <div class="muted" id="loginStatus">กำลังยืนยันสิทธิ์ผ่าน LINE...</div>
+    <div style="margin-top:18px"><span class="spinner"></span></div>
   </div>
-
-
-  <!-- ==================================================
-       DASHBOARD
-       ================================================== -->
-
-  <div class="grid">
-
-    <div class="card">
-
-      พนักงาน Active
-
-      <div
-        id="active"
-        class="num">
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      ทำงานวันนี้
-
-      <div
-        id="working"
-        class="num">
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      ยังไม่ Clock-out
-
-      <div
-        id="missing"
-        class="num">
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      มาสายวันนี้
-
-      <div
-        id="late"
-        class="num">
-        -
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- ==================================================
-       NAVIGATION
-       ================================================== -->
-
-  <div class="nav">
-
-    <button
-      onclick="show('attendance')">
-      🕐 Attendance
-    </button>
-
-
-    <button
-      onclick="show('employees')">
-      👥 Employees
-    </button>
-
-
-    <button
-      onclick="show('payroll')">
-      💰 Payroll
-    </button>
-
-
-    <button
-      onclick="show('audit')">
-      📋 Audit Log
-    </button>
-
-
-    <button
-      id="adminBtn"
-      class="secondary"
-      onclick="show('admins')">
-      👑 Admins
-    </button>
-
-  </div>
-
-
-  <!-- ==================================================
-       ATTENDANCE
-       ================================================== -->
-
-  <section
-    id="attendance"
-    class="section hidden">
-
-    <h2>
-      Attendance
-    </h2>
-
-    <div class="muted">
-      แสดง Daily_Attendance ของวันที่เลือก
-    </div>
-
-
-    <input
-      id="attDate"
-      type="date"
-    >
-
-
-    <div class="button-row">
-
-      <button
-        class="action"
-        onclick="loadAttendance()">
-        🔄 Refresh
-      </button>
-
-    </div>
-
-
-    <div
-      id="attTable"
-      class="tablewrap">
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       EMPLOYEES
-       ================================================== -->
-
-  <section
-    id="employees"
-    class="section hidden">
-
-    <h2>
-      Employees
-    </h2>
-
-
-    <div class="button-row">
-
-      <button
-        class="action"
-        onclick="loadEmployees()">
-        🔄 Refresh
-      </button>
-
-    </div>
-
-
-    <div
-      id="empTable"
-      class="tablewrap">
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       PAYROLL
-       ================================================== -->
-
-  <section
-    id="payroll"
-    class="section hidden">
-
-    <h2>
-      Payroll
-    </h2>
-
-
-    <div class="muted">
-      เลือก Payroll Period จาก Payroll_Periods
-    </div>
-
-
-    <select
-      id="period">
-
-      <option value="">
-        -- เลือก Payroll Period --
-      </option>
-
-    </select>
-
-
-    <div
-      id="periodInfo">
-    </div>
-
-
-    <div class="button-row">
-
-      <button
-        class="action"
-        onclick="loadPayroll()">
-        📊 Load Payroll
-      </button>
-
-
-      <button
-        class="action green"
-        onclick="recalculatePayroll()">
-        🔄 Recalculate
-      </button>
-
-    </div>
-
-
-    <div
-      id="payTable"
-      class="tablewrap">
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       AUDIT LOG
-       ================================================== -->
-
-  <section
-    id="audit"
-    class="section hidden">
-
-    <h2>
-      Audit Log
-    </h2>
-
-
-    <div class="button-row">
-
-      <button
-        class="action"
-        onclick="loadAudit()">
-        🔄 Refresh
-      </button>
-
-    </div>
-
-
-    <div
-      id="auditTable"
-      class="tablewrap">
-    </div>
-
-  </section>
-
-
-  <!-- ==================================================
-       ADMINS
-       ================================================== -->
-
-  <section
-    id="admins"
-    class="section hidden">
-
-    <h2>
-      Admins
-    </h2>
-
-
-    <div class="muted">
-      เฉพาะ SUPER_ADMIN
-    </div>
-
-
-    <div class="button-row">
-
-      <button
-        class="action"
-        onclick="loadAdmins()">
-        🔄 Refresh
-      </button>
-
-    </div>
-
-
-    <div
-      id="adminTable"
-      class="tablewrap">
-    </div>
-
-  </section>
-
-
 </div>
 
+<div class="app">
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">E-CHA ADMIN<small>Staff Attendance & Payroll</small></div>
+    <div class="navgroup">
+      <div class="navlabel">Overview</div>
+      <button class="navbtn active" data-section="dashboard"><span class="ico">🏠</span>Dashboard</button>
+      <button class="navbtn" data-section="attendance"><span class="ico">🕐</span>Attendance</button>
+    </div>
+    <div class="navgroup">
+      <div class="navlabel">People</div>
+      <button class="navbtn" data-section="employees"><span class="ico">👥</span>Employees</button>
+      <button class="navbtn admin-only" data-section="admins"><span class="ico">👑</span>Admin Management</button>
+    </div>
+    <div class="navgroup">
+      <div class="navlabel">Payroll</div>
+      <button class="navbtn" data-section="payroll"><span class="ico">💰</span>Payroll</button>
+      <button class="navbtn" data-section="adjustments"><span class="ico">🧾</span>Adjustments</button>
+      <button class="navbtn" data-section="incentive"><span class="ico">⭐</span>Incentive</button>
+      <button class="navbtn" data-section="payslip"><span class="ico">📄</span>Payslip</button>
+    </div>
+    <div class="navgroup">
+      <div class="navlabel">Control</div>
+      <button class="navbtn" data-section="audit"><span class="ico">📋</span>Audit Log</button>
+      <button class="navbtn super-only" data-section="settings"><span class="ico">⚙️</span>System Settings</button>
+    </div>
+    <div class="foot">Role-based access is enforced by Apps Script backend.</div>
+  </aside>
 
+  <main class="main">
+    <header class="topbar">
+      <button class="menu" onclick="toggleSidebar()">☰</button>
+      <div class="top-title" id="topTitle">Dashboard</div>
+      <div class="user"><span id="adminName">Admin</span><span id="roleBadge" class="role">...</span></div>
+    </header>
+
+    <div class="content">
+      <div id="flash"></div>
+
+      <section id="dashboard" class="section active">
+        <div class="pagehead">
+          <div><h1>Dashboard</h1><p id="dashDate">ภาพรวมการทำงานวันนี้</p></div>
+          <div class="actions"><button class="btn secondary" onclick="refreshDashboard()">🔄 Refresh</button></div>
+        </div>
+        <div class="grid">
+          <div class="card kpi"><div class="label">พนักงาน Active</div><div id="kActive" class="num">-</div><div class="hint">Employees</div></div>
+          <div class="card kpi"><div class="label">ทำงานวันนี้</div><div id="kWorking" class="num">-</div><div class="hint">Check-in แล้ว</div></div>
+          <div class="card kpi"><div class="label">ยังไม่ Clock-out</div><div id="kMissing" class="num">-</div><div class="hint">ต้องตรวจสอบ</div></div>
+          <div class="card kpi"><div class="label">มาสายวันนี้</div><div id="kLate" class="num">-</div><div class="hint">Late records</div></div>
+        </div>
+        <div class="panel">
+          <h3>Quick Actions</h3>
+          <div class="actions">
+            <button class="btn" onclick="go('attendance')">🕐 ตรวจ Attendance</button>
+            <button class="btn" onclick="go('payroll')">💰 ตรวจ Payroll</button>
+            <button class="btn" onclick="go('employees')">👥 จัดการ Employees</button>
+            <button class="btn" onclick="go('adjustments')">🧾 เพิ่ม Adjustment</button>
+            <button class="btn" onclick="go('incentive')">⭐ เพิ่ม Incentive</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="attendance" class="section">
+        <div class="pagehead"><div><h1>Attendance</h1><p>Daily Attendance + Raw Attendance Logs</p></div><div class="actions"><button class="btn secondary" onclick="loadAttendance()">🔄 Refresh</button><button class="btn blue" onclick="openAttendanceModal()">✏️ แก้ไข / เพิ่มเวลา</button></div></div>
+        <div class="panel">
+          <div class="toolbar">
+            <div class="field"><label>วันที่</label><input id="attDate" type="date"></div>
+            <div class="field"><label>Employee ID (ถ้าต้องการ)</label><input id="attEmp" placeholder="เช่น PT001"></div>
+            <div><button class="btn" onclick="loadAttendance()">Load</button></div>
+          </div>
+          <div id="attSummary"></div>
+          <div id="attTable" class="tablewrap"></div>
+        </div>
+        <div class="panel">
+          <h3>Raw Attendance Logs</h3>
+          <div class="muted" style="margin-bottom:10px">ใช้สำหรับตรวจสอบ/แก้ไข Log ต้นทาง</div>
+          <div id="logTable" class="tablewrap"></div>
+        </div>
+      </section>
+
+      <section id="employees" class="section">
+        <div class="pagehead"><div><h1>Employees</h1><p>ข้อมูลพนักงานและค่าจ้าง</p></div><div class="actions"><button class="btn blue" onclick="openEmployeeModal()">＋ Add Employee</button><button class="btn secondary" onclick="loadEmployees()">🔄 Refresh</button></div></div>
+        <div class="panel"><div id="empTable" class="tablewrap"></div></div>
+      </section>
+
+      <section id="payroll" class="section">
+        <div class="pagehead"><div><h1>Payroll</h1><p>คำนวณ → ตรวจสอบ → Approve → Paid</p></div><div class="actions"><button class="btn secondary" onclick="loadPayroll()">🔄 Refresh</button></div></div>
+        <div class="panel">
+          <div class="toolbar">
+            <div class="field wide"><label>Payroll Period</label><select id="periodSelect"></select></div>
+            <div><button class="btn blue" onclick="recalculate()">🧮 Recalculate</button></div>
+            <div><button class="btn" onclick="loadPayroll()">Load</button></div>
+          </div>
+          <div id="periodInfo" class="notice">เลือกงวดเพื่อดูรายละเอียด</div>
+          <div id="payStats" class="statrow"></div>
+          <div id="payActions" class="actions" style="margin:12px 0"></div>
+          <div id="payTable" class="tablewrap"></div>
+        </div>
+      </section>
+
+      <section id="adjustments" class="section">
+        <div class="pagehead"><div><h1>Payroll Adjustments</h1><p>รายได้เพิ่ม / รายการหัก สำหรับงวด Payroll</p></div><div class="actions"><button class="btn secondary" onclick="loadAdjustments()">🔄 Refresh</button></div></div>
+        <div class="panel">
+          <h3>เพิ่ม Adjustment</h3>
+          <div class="formgrid">
+            <div><label>วันที่</label><input id="adjDate" type="date"></div>
+            <div><label>Employee</label><select id="adjEmp"></select></div>
+            <div><label>Category</label><input id="adjCategory" value="Other"></div>
+            <div><label>Kind</label><select id="adjKind"><option value="Earning">Earning (+)</option><option value="Deduction">Deduction (-)</option></select></div>
+            <div><label>Amount</label><input id="adjAmount" type="number" step="0.01" min="0"></div>
+            <div><label>Status</label><select id="adjStatus"><option>Pending</option><option>Approved</option><option>Paid</option></select></div>
+            <div class="full"><label>Description</label><input id="adjDescription"></div>
+            <div class="full"><label>Note</label><textarea id="adjNote"></textarea></div>
+          </div>
+          <div class="actions" style="margin-top:12px"><button class="btn blue" onclick="saveAdjustment()">💾 Save Adjustment</button></div>
+        </div>
+        <div class="panel"><h3>รายการล่าสุด</h3><div id="adjTable" class="tablewrap"></div></div>
+      </section>
+
+      <section id="incentive" class="section">
+        <div class="pagehead"><div><h1>Incentive</h1><p>บันทึก Incentive Bonus สะสม</p></div><div class="actions"><button class="btn secondary" onclick="loadIncentives()">🔄 Refresh</button></div></div>
+        <div class="panel">
+          <h3>เพิ่ม Incentive</h3>
+          <div class="formgrid">
+            <div><label>วันที่</label><input id="incDate" type="date"></div>
+            <div><label>Employee</label><select id="incEmp"></select></div>
+            <div class="full"><label>Description</label><input id="incDescription"></div>
+            <div><label>Amount</label><input id="incAmount" type="number" step="0.01" min="0"></div>
+            <div><label>Status</label><select id="incStatus"><option>Pending</option><option>Approved</option><option>Paid</option></select></div>
+            <div><label>Paid Date</label><input id="incPaidDate" type="date"></div>
+          </div>
+          <div class="actions" style="margin-top:12px"><button class="btn blue" onclick="saveIncentive()">💾 Save Incentive</button></div>
+        </div>
+        <div class="panel"><h3>รายการล่าสุด</h3><div id="incTable" class="tablewrap"></div></div>
+      </section>
+
+      <section id="payslip" class="section">
+        <div class="pagehead"><div><h1>Payslip</h1><p>สร้างมุมมองสลิปจาก Payroll ที่คำนวณแล้ว</p></div></div>
+        <div class="panel">
+          <div class="toolbar">
+            <div class="field"><label>Payroll Period</label><select id="slipPeriod"></select></div>
+            <div class="field"><label>Employee</label><select id="slipEmp"></select></div>
+            <div><button class="btn" onclick="renderPayslip()">View</button></div>
+            <div><button class="btn secondary" onclick="window.print()">🖨 Print</button></div>
+          </div>
+          <div id="slipArea" class="print-area"><div class="empty">เลือก Period และ Employee</div></div>
+        </div>
+      </section>
+
+      <section id="audit" class="section">
+        <div class="pagehead"><div><h1>Audit Log</h1><p>ประวัติการดำเนินการของ Admin</p></div><div><button class="btn secondary" onclick="loadAudit()">🔄 Refresh</button></div></div>
+        <div class="panel"><div id="auditTable" class="tablewrap"></div></div>
+      </section>
+
+      <section id="admins" class="section super-only-section">
+        <div class="pagehead"><div><h1>Admin Management</h1><p>จัดการ ADMIN / SUPER_ADMIN</p></div><div class="actions"><button class="btn blue" onclick="openAdminModal()">＋ Add / Edit Admin</button><button class="btn secondary" onclick="loadAdmins()">🔄 Refresh</button></div></div>
+        <div class="notice">เฉพาะ SUPER_ADMIN เท่านั้นที่สามารถจัดการบัญชี Admin และ Role ได้</div>
+        <div class="panel"><div id="adminTable" class="tablewrap"></div></div>
+      </section>
+
+      <section id="settings" class="section super-only-section">
+        <div class="pagehead"><div><h1>System Settings</h1><p>ค่ากฎ Payroll ที่ Backend ใช้งาน</p></div><div><button class="btn secondary" onclick="loadSettings()">🔄 Refresh</button></div></div>
+        <div class="notice">แก้ไข Settings มีผลต่อการคำนวณ Payroll รอบถัดไป หลังจาก Recalculate</div>
+        <div class="panel"><div id="settingsTable" class="tablewrap"></div><div class="actions" style="margin-top:12px"><button class="btn blue" onclick="saveAllSettings()">💾 Save Settings</button></div></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modalhead"><h3 id="modalTitle"></h3><button class="close" onclick="closeModal()">✕</button></div><div id="modalBody" class="modalbody"></div><div id="modalFoot" class="modalfoot"></div></div></div>
 
 <script>
-
-
-/* =====================================================
-   CONFIG
-   ===================================================== */
-
-const CONFIG = {
-
-  LIFF_ID:
-    '2011734616-wit93kJp',
-
-  API_URL:
-    'https://script.google.com/macros/s/AKfycbyBPYGNYSEEGkAGhIAzLBHXsEukhJR8QRfphmuR9pVdiOgt3V909tbePSuMuSFlCLUHJw/exec'
-
+const CONFIG={
+  LIFF_ID:'2011734616-wit93kJp',
+  API_URL:'https://script.google.com/macros/s/AKfycbyBPYGNYSEEGkAGhIAzLBHXsEukhJR8QRfphmuR9pVdiOgt3V909tbePSuMuSFlCLUHJw/exec'
 };
+let idToken='', role='', adminName='', currentPayroll=[], employees=[], periods=[];
 
-
-
-/* =====================================================
-   GLOBAL
-   ===================================================== */
-
-let idToken = '';
-
-let role = '';
-
-let adminName = '';
-
-
-
-/* =====================================================
-   HELPER
-   ===================================================== */
-
-const $ =
-  id => document.getElementById(id);
-
-
-
-/* =====================================================
-   ESCAPE HTML
-   ===================================================== */
-
-function esc(value){
-
-  return String(
-    value ?? ''
-  ).replace(
-    /[&<>"']/g,
-
-    char => ({
-
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      '"':'&quot;',
-      "'":'&#39;'
-
-    }[char])
-
-  );
-
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=v=>Number(v||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2});
+const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Bangkok'});
+function fmtDate(v){if(!v)return '';const s=String(v);return s.length>=10?s.slice(0,10):s}
+function statusBadge(v){const s=String(v||'');const cls=s.toLowerCase().includes('paid')?'paid':s.toLowerCase().includes('approved')?'approved':s.toLowerCase().includes('active')?'active':s.toLowerCase().includes('inactive')?'inactive':'pending';return '<span class="status '+cls+'">'+esc(s||'-')+'</span>'}
+function flash(msg,type='success'){ $('flash').innerHTML='<div class="'+type+'">'+esc(msg)+'</div>'; setTimeout(()=>{$('flash').innerHTML=''},3500)}
+function toggleSidebar(){$('sidebar').classList.toggle('open')}
+function go(id){document.querySelector('.navbtn[data-section="'+id+'"]')?.click()}
+function setSection(id){
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.section===id));
+  $('topTitle').textContent=document.querySelector('.navbtn[data-section="'+id+'"]')?.textContent.replace(/^[^A-Za-zก-๙]+/,'').trim()||id;
+  $('sidebar').classList.remove('open');
+  const loaders={dashboard:refreshDashboard,attendance:loadAttendance,employees:loadEmployees,payroll:loadPayroll,adjustments:loadAdjustments,incentive:loadIncentives,payslip:loadPayslipSetup,audit:loadAudit,admins:loadAdmins,settings:loadSettings};
+  if(loaders[id]) loaders[id]();
 }
+document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>setSection(b.dataset.section)));
 
-
-
-/* =====================================================
-   MESSAGE
-   ===================================================== */
-
-function clearMessage(){
-
-  $('error').innerHTML = '';
-
+async function api(action,payload={}){
+  const res=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({requestType:'admin',action,idToken,...payload})});
+  const d=await res.json();
+  if(!d.ok) throw new Error(d.error||'API Error');
+  return d;
 }
-
-
-function showError(message){
-
-  $('error').innerHTML =
-
-    '<div class="error">' +
-
-    esc(message) +
-
-    '</div>';
-
-}
-
-
-function showSuccess(message){
-
-  $('error').innerHTML =
-
-    '<div class="success">' +
-
-    esc(message) +
-
-    '</div>';
-
-}
-
-
-function showLoading(message){
-
-  $('error').innerHTML =
-
-    '<div class="loading">' +
-
-    esc(
-      message ||
-      'กำลังโหลด...'
-    ) +
-
-    '</div>';
-
-}
-
-
-
-/* =====================================================
-   BANGKOK DATE
-   ===================================================== */
-
-function getBangkokDate(){
-
-  try{
-
-    const formatter =
-      new Intl.DateTimeFormat(
-        'en-CA',
-        {
-          timeZone:
-            'Asia/Bangkok',
-
-          year:
-            'numeric',
-
-          month:
-            '2-digit',
-
-          day:
-            '2-digit'
-        }
-      );
-
-    return formatter.format(
-      new Date()
-    );
-
-  }catch(error){
-
-    /*
-      Fallback
-    */
-
-    const now =
-      new Date();
-
-    const y =
-      now.getFullYear();
-
-    const m =
-      String(
-        now.getMonth()+1
-      ).padStart(
-        2,
-        '0'
-      );
-
-    const d =
-      String(
-        now.getDate()
-      ).padStart(
-        2,
-        '0'
-      );
-
-    return `${y}-${m}-${d}`;
-
-  }
-
-}
-
-
-
-/* =====================================================
-   INIT
-   ===================================================== */
 
 async function init(){
-
   try{
-
-    clearMessage();
-
-
-    /* -----------------------------------------------
-       CHECK CONFIG
-       ----------------------------------------------- */
-
-    if(
-      !CONFIG.LIFF_ID ||
-      CONFIG.LIFF_ID.includes(
-        'PUT_'
-      )
-    ){
-
-      throw new Error(
-        'ยังไม่ได้ตั้ง Admin LIFF ID'
-      );
-
-    }
-
-
-    if(
-      !CONFIG.API_URL ||
-      CONFIG.API_URL.includes(
-        'PUT_'
-      )
-    ){
-
-      throw new Error(
-        'ยังไม่ได้ตั้ง Apps Script Web App URL'
-      );
-
-    }
-
-
-    /* -----------------------------------------------
-       LIFF
-       ----------------------------------------------- */
-
-    await liff.init({
-
-      liffId:
-        CONFIG.LIFF_ID
-
-    });
-
-
-    /* -----------------------------------------------
-       LOGIN
-       ----------------------------------------------- */
-
-    if(
-      !liff.isLoggedIn()
-    ){
-
-      liff.login();
-
-      return;
-
-    }
-
-
-    /* -----------------------------------------------
-       ID TOKEN
-       ----------------------------------------------- */
-
-    idToken =
-      liff.getIDToken();
-
-
-    if(!idToken){
-
-      throw new Error(
-        'ไม่พบ LINE ID Token'
-      );
-
-    }
-
-
-    /* -----------------------------------------------
-       CHECK ADMIN
-       ----------------------------------------------- */
-
-    showLoading(
-      'กำลังตรวจสอบสิทธิ์ Admin...'
-    );
-
-
-    const dashboard =
-      await api(
-        'DASHBOARD'
-      );
-
-
-    /* -----------------------------------------------
-       ROLE
-       ----------------------------------------------- */
-
-    role =
-      String(
-        dashboard.role ||
-        ''
-      ).toUpperCase();
-
-
-    adminName =
-      dashboard.adminName ||
-      dashboard.name ||
-      'Admin';
-
-
-    $('role').textContent =
-      role || 'ADMIN';
-
-
-    $('name').textContent =
-      adminName;
-
-
-    /* -----------------------------------------------
-       ADMIN MENU
-       ----------------------------------------------- */
-
-    if(
-      role !== 'SUPER_ADMIN'
-    ){
-
-      $('adminBtn')
-        .style
-        .display =
-        'none';
-
-    }else{
-
-      $('adminBtn')
-        .style
-        .display =
-        '';
-
-    }
-
-
-    /* -----------------------------------------------
-       DASHBOARD
-       ----------------------------------------------- */
-
-    renderDashboard(
-      dashboard.data ||
-      {}
-    );
-
-
-    clearMessage();
-
-
-    /* -----------------------------------------------
-       DEFAULT DATE
-       ----------------------------------------------- */
-
-    /*
-      ตั้งวันที่เฉพาะหลัง Login สำเร็จ
-      และใช้ Bangkok date
-    */
-
-    const attDate =
-      $('attDate');
-
-    if(
-      attDate &&
-      !attDate.value
-    ){
-
-      attDate.value =
-        getBangkokDate();
-
-    }
-
-
-    /* -----------------------------------------------
-       DEFAULT PAGE
-       ----------------------------------------------- */
-
-    show(
-      'attendance'
-    );
-
-
-  }catch(error){
-
-    console.error(
-      'ADMIN INIT ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
+    await liff.init({liffId:CONFIG.LIFF_ID});
+    if(!liff.isLoggedIn()){liff.login();return}
+    idToken=liff.getIDToken();
+    if(!idToken) throw new Error('ไม่พบ LINE ID Token');
+    const d=await api('DASHBOARD');
+    role=d.role; adminName=d.adminName||'Admin';
+    $('adminName').textContent=adminName;
+    $('roleBadge').textContent=role;
+    document.querySelectorAll('.admin-only,.super-only,.super-only-section').forEach(el=>el.style.display=role==='SUPER_ADMIN'?'':'none');
+    $('loginBox').style.display='none';
+    $('attDate').value=today(); $('adjDate').value=today(); $('incDate').value=today();
+    await loadEmployees();
+    await loadPeriods();
+    renderDashboard(d.data);
+    setSection('dashboard');
+  }catch(e){
+    $('loginStatus').textContent=e.message||String(e);
+    $('loginBox').querySelector('.spinner').style.display='none';
   }
-
 }
 
+function renderDashboard(d){
+  $('kActive').textContent=d.activeEmployees??0;
+  $('kWorking').textContent=d.workingToday??0;
+  $('kMissing').textContent=d.missingClockOut??0;
+  $('kLate').textContent=d.lateToday??0;
+  $('dashDate').textContent='ภาพรวมวันที่ '+(d.date||today())+' · Payroll rows '+(d.payrollRows??0);
+}
+async function refreshDashboard(){try{const d=await api('DASHBOARD');renderDashboard(d.data);flash('Dashboard อัปเดตแล้ว')}catch(e){flash(e.message,'error')}}
 
-
-/* =====================================================
-   API
-   ===================================================== */
-
-async function api(
-  action,
-  payload = {}
-){
-
-  if(!CONFIG.API_URL){
-
-    throw new Error(
-      'ไม่พบ API URL'
-    );
-
-  }
-
-
-  if(!idToken){
-
-    throw new Error(
-      'ไม่พบ LINE ID Token'
-    );
-
-  }
-
-
-  const requestBody = {
-
-    requestType:
-      'admin',
-
-    action:
-      action,
-
-    idToken:
-      idToken,
-
-    ...payload
-
-  };
-
-
-  const response =
-    await fetch(
-      CONFIG.API_URL,
-      {
-
-        method:
-          'POST',
-
-        headers:{
-          'Content-Type':
-            'text/plain;charset=utf-8'
-        },
-
-        body:
-          JSON.stringify(
-            requestBody
-          )
-
-      }
-    );
-
-
-  if(!response.ok){
-
-    throw new Error(
-      'Apps Script HTTP Error ' +
-      response.status
-    );
-
-  }
-
-
-  const responseText =
-    await response.text();
-
-
-  let data;
-
-
-  try{
-
-    data =
-      JSON.parse(
-        responseText
-      );
-
-  }catch(error){
-
-    console.error(
-      'INVALID JSON',
-      responseText
-    );
-
-    throw new Error(
-      'Apps Script ส่งข้อมูลกลับมาไม่ใช่ JSON'
-    );
-
-  }
-
-
-  if(!data.ok){
-
-    throw new Error(
-      data.error ||
-      'API Error'
-    );
-
-  }
-
-
-  return data;
-
+function table(rows,cols,opts={}){
+  if(!rows||!rows.length)return '<div class="empty">ไม่มีข้อมูล</div>';
+  const head=cols.map(c=>'<th>'+esc(opts.labels?.[c]||c)+'</th>').join('');
+  const body=rows.map((r,i)=>'<tr>'+cols.map(c=>'<td>'+(opts.cell?opts.cell(r,c,i):esc(r[c]))+'</td>').join('')+'</tr>').join('');
+  return '<table><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table>';
 }
 
-
-
-/* =====================================================
-   DASHBOARD
-   ===================================================== */
-
-function renderDashboard(
-  data
-){
-
-  $('active').textContent =
-    data.activeEmployees ??
-    '-';
-
-
-  $('working').textContent =
-    data.workingToday ??
-    '-';
-
-
-  $('missing').textContent =
-    data.missingClockOut ??
-    '-';
-
-
-  $('late').textContent =
-    data.lateToday ??
-    '-';
-
-}
-
-
-
-/* =====================================================
-   SECTION
-   ===================================================== */
-
-function show(id){
-
-  document
-    .querySelectorAll(
-      'section'
-    )
-    .forEach(
-      section =>
-        section.classList.add(
-          'hidden'
-        )
-    );
-
-
-  const target =
-    $(id);
-
-
-  if(!target){
-
-    showError(
-      'ไม่พบ Section: ' +
-      id
-    );
-
-    return;
-
-  }
-
-
-  target.classList.remove(
-    'hidden'
-  );
-
-
-  /* -----------------------------------------------
-     LOAD DATA
-     ----------------------------------------------- */
-
-  if(
-    id === 'attendance'
-  ){
-
-    loadAttendance();
-
-  }
-
-
-  if(
-    id === 'employees'
-  ){
-
-    loadEmployees();
-
-  }
-
-
-  if(
-    id === 'payroll'
-  ){
-
-    loadPayrollPeriods();
-
-  }
-
-
-  if(
-    id === 'audit'
-  ){
-
-    loadAudit();
-
-  }
-
-
-  if(
-    id === 'admins'
-  ){
-
-    if(
-      role === 'SUPER_ADMIN'
-    ){
-
-      loadAdmins();
-
-    }else{
-
-      showError(
-        'เฉพาะ SUPER_ADMIN เท่านั้น'
-      );
-
-    }
-
-  }
-
-}
-
-
-
-/* =====================================================
-   ATTENDANCE
-   ===================================================== */
-
+let rawAttendanceLogs=[];
 async function loadAttendance(){
-
   try{
-
-    showLoading(
-      'กำลังโหลด Attendance...'
-    );
-
-
-    const date =
-      $('attDate')
-        .value
-        .trim();
-
-
-    /*
-      ถ้ามีวันที่ → ส่ง date
-      ถ้าไม่มี → Backend ใช้ default
-    */
-
-    const payload =
-      date
-        ? {
-            date:
-              date
-          }
-        : {};
-
-
-    const d =
-      await api(
-        'ATTENDANCE',
-        payload
-      );
-
-
-    $('attTable')
-      .innerHTML =
-      table(
-        d.data ||
-        [],
-
-        [
-          'employeeId',
-          'name',
-          'type',
-          'checkIn',
-          'checkOut',
-          'hours',
-          'basePay',
-          'otHours',
-          'otPay',
-          'status'
-        ]
-      );
-
-
-    clearMessage();
-
-
-  }catch(error){
-
-    console.error(
-      'ATTENDANCE ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+    const date=$('attDate').value||today(), employeeId=$('attEmp').value.trim();
+    const d=await api('ATTENDANCE',{date,employeeId});
+    const rows=d.data||[];
+    $('attSummary').innerHTML='<div class="muted" style="margin-bottom:10px">พบ '+rows.length+' รายการ · '+date+'</div>';
+    $('attTable').innerHTML=table(rows,['employeeId','name','type','checkIn','checkOut','hours','basePay','otHours','otPay','holidayPay','status'],{labels:{employeeId:'Employee',name:'Name',type:'Type',checkIn:'IN',checkOut:'OUT',hours:'Hours',basePay:'Base',otHours:'OT Hrs',otPay:'OT Pay',holidayPay:'Holiday',status:'Status'},cell:(r,c)=>c==='basePay'||c==='otPay'||c==='holidayPay'?money(r[c]):c==='status'?statusBadge(r[c]):esc(r[c])});
+    const l=await api('ATTENDANCE_LOGS',{date,employeeId});
+    rawAttendanceLogs=l.data||[];
+    $('logTable').innerHTML=table(l.data||[],['logId','timestamp','displayName','action','distanceMeter','areaStatus','actions'],{labels:{logId:'Log ID',timestamp:'Timestamp',displayName:'Name',action:'Action',distanceMeter:'Meter',areaStatus:'Area',actions:'Actions'},cell:(r,c)=>c==='action'?(r[c]==='เข้างาน'?'<span class="status active">IN</span>':'<span class="status pending">OUT</span>'):c==='actions'?'<button class="btn small secondary" data-log-edit="'+esc(r.logId)+'">✏️ Edit</button>':esc(r[c])});
+  }catch(e){flash(e.message,'error')}
 }
 
-
-
-/* =====================================================
-   EMPLOYEES
-   ===================================================== */
+function openAttendanceModal(log=null){
+  const opts=employees.map(e=>'<option value="'+esc(e.employeeId)+'">'+esc(e.employeeId+' · '+e.name)+'</option>').join('');
+  $('modalTitle').textContent=log?'แก้ไข Attendance Log':'เพิ่ม Attendance Log';
+  $('modalBody').innerHTML=`<div class="formgrid">
+    <div class="full"><label>Employee</label><select id="mAttEmp">${opts}</select></div>
+    <div><label>วันที่</label><input id="mAttDate" type="date" value="${esc(log?String(log.timestamp).slice(0,10):$('attDate').value||today())}"></div>
+    <div><label>เวลา</label><input id="mAttTime" type="time" value="${esc(log?String(log.timestamp).slice(11,16):'17:00')}"></div>
+    <div><label>Action</label><select id="mAttAction"><option value="เข้างาน">เข้างาน</option><option value="ออกงาน">ออกงาน</option></select></div>
+    <div class="full"><label>Reason</label><textarea id="mAttReason" placeholder="เช่น ลืม Clock-out / แก้เวลาตามหัวหน้างาน"></textarea></div>
+  </div>`;
+  if(log){$('mAttEmp').value=employeeIdFromLog(log)||'';$('mAttAction').value=log.action;$('mAttDate').value=String(log.timestamp).slice(0,10);$('mAttTime').value=String(log.timestamp).slice(11,16)}
+  $('modalFoot').innerHTML='<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn blue" onclick="saveAttendanceModal('+(log?JSON.stringify(log):'null').replaceAll('"','&quot;')+')">Save</button>';
+  $('modal').classList.add('show');
+}
+function employeeIdFromLog(log){const e=employees.find(x=>String(x.lineUserId||'')===String(log.lineUserId||''));return e?.employeeId||''}
+function editLog(log){openAttendanceModal(log)}
+async function saveAttendanceModal(log){
+  try{
+    const p={employeeId:$('mAttEmp').value,date:$('mAttDate').value,time:$('mAttTime').value,action:$('mAttAction').value,reason:$('mAttReason').value.trim()};
+    if(log){p.logId=log.logId;p.timestamp=p.date+'T'+p.time+':00+07:00';await api('EDIT_ATTENDANCE',p)}else await api('ADD_ATTENDANCE_LOG',p);
+    closeModal();flash('บันทึก Attendance แล้ว');await loadAttendance();await refreshDashboard();
+  }catch(e){flash(e.message,'error')}
+}
+function closeModal(){$('modal').classList.remove('show')}
 
 async function loadEmployees(){
-
   try{
-
-    showLoading(
-      'กำลังโหลด Employees...'
-    );
-
-
-    const d =
-      await api(
-        'EMPLOYEES'
-      );
-
-
-    $('empTable')
-      .innerHTML =
-      table(
-        d.data ||
-        [],
-
-        [
-          'employeeId',
-          'name',
-          'type',
-          'position',
-          'salaryRate',
-          'positionAllowance',
-          'attendanceBonus',
-          'status'
-        ]
-      );
-
-
-    clearMessage();
-
-
-  }catch(error){
-
-    console.error(
-      'EMPLOYEES ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+    const d=await api('EMPLOYEES');employees=d.data||[];
+    $('empTable').innerHTML=table(employees,['employeeId','name','type','position','salaryRate','offDays','positionAllowance','attendanceBonus','lineUserId','bankAccount','status','actions'],{
+      labels:{employeeId:'ID',name:'Name',type:'Type',position:'Position',salaryRate:'Rate',offDays:'Off',positionAllowance:'Position',attendanceBonus:'Attendance',lineUserId:'LINE User ID',bankAccount:'Bank',status:'Status',actions:'Actions'},
+      cell:(r,c)=>c==='salaryRate'||c==='positionAllowance'||c==='attendanceBonus'?money(r[c]):c==='status'?statusBadge(r[c]):c==='actions'?'<button class="btn small secondary" data-edit-emp="'+esc(r.employeeId)+'">✏️ Edit</button>':esc(r[c])
+    });
+    fillEmployeeSelects();
+  }catch(e){flash(e.message,'error')}
+}
+function fillEmployeeSelects(){
+  const html=employees.map(e=>'<option value="'+esc(e.employeeId)+'">'+esc(e.employeeId+' · '+e.name)+'</option>').join('');
+  ['adjEmp','incEmp','slipEmp'].forEach(id=>{if($(id))$(id).innerHTML='<option value="">เลือกพนักงาน</option>'+html});
+}
+function openEmployeeModal(emp=null){
+  $('modalTitle').textContent=emp?'แก้ไข Employee':'เพิ่ม Employee';
+  const v=k=>esc(emp?.[k]??'');
+  $('modalBody').innerHTML=`<div class="formgrid">
+    <div><label>Employee ID</label><input id="mEmpId" value="${v('employeeId')}" ${emp?'readonly':''}></div>
+    <div><label>Name</label><input id="mEmpName" value="${v('name')}"></div>
+    <div><label>Type</label><select id="mEmpType"><option>Full-time</option><option>Part-time</option></select></div>
+    <div><label>Position</label><input id="mEmpPosition" value="${v('position')}"></div>
+    <div><label>Salary Rate</label><input id="mEmpRate" type="number" value="${v('salaryRate')}"></div>
+    <div><label>Off Days</label><input id="mEmpOff" type="number" value="${v('offDays')}"></div>
+    <div><label>Position Allowance</label><input id="mEmpPos" type="number" value="${v('positionAllowance')}"></div>
+    <div><label>Attendance Bonus</label><input id="mEmpAtt" type="number" value="${v('attendanceBonus')}"></div>
+    <div><label>LINE User ID</label><input id="mEmpLine" value="${v('lineUserId')}"></div>
+    <div><label>Bank Account</label><input id="mEmpBank" value="${v('bankAccount')}"></div>
+    <div><label>Status</label><select id="mEmpStatus"><option>Active</option><option>Inactive</option></select></div>
+    <div class="full"><label>Reason</label><textarea id="mEmpReason"></textarea></div>
+  </div>`;
+  if(emp){$('mEmpType').value=emp.type;$('mEmpStatus').value=emp.status}
+  $('modalFoot').innerHTML='<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn blue" onclick="saveEmployee()">Save Employee</button>';
+  $('modal').classList.add('show');
+}
+$('empTable').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-edit-emp]');if(!b)return;
+  const emp=employees.find(x=>x.employeeId===b.dataset.editEmp);if(emp)openEmployeeModal(emp);
+});
+async function saveEmployee(){
+  try{
+    const p={employeeId:$('mEmpId').value.trim(),name:$('mEmpName').value.trim(),type:$('mEmpType').value,position:$('mEmpPosition').value.trim(),salaryRate:$('mEmpRate').value,offDays:$('mEmpOff').value,positionAllowance:$('mEmpPos').value,attendanceBonus:$('mEmpAtt').value,lineUserId:$('mEmpLine').value.trim(),bankAccount:$('mEmpBank').value.trim(),status:$('mEmpStatus').value,reason:$('mEmpReason').value.trim()};
+    await api('SAVE_EMPLOYEE',p);closeModal();flash('บันทึก Employee แล้ว');loadEmployees();
+  }catch(e){flash(e.message,'error')}
 }
 
-
-
-/* =====================================================
-   PAYROLL PERIODS
-   ===================================================== */
-
-async function loadPayrollPeriods(){
-
+async function loadPeriods(){
   try{
-
-    showLoading(
-      'กำลังโหลด Payroll Periods...'
-    );
-
-
-    const d =
-      await api(
-        'LIST_PAYROLL_PERIODS'
-      );
-
-
-    const select =
-      $('period');
-
-
-    select.innerHTML =
-      '';
-
-
-    const defaultOption =
-      document.createElement(
-        'option'
-      );
-
-
-    defaultOption.value =
-      '';
-
-
-    defaultOption.textContent =
-      '-- เลือก Payroll Period --';
-
-
-    select.appendChild(
-      defaultOption
-    );
-
-
-    const periods =
-      Array.isArray(
-        d.data
-      )
-        ? d.data
-        : [];
-
-
-    periods.forEach(
-      period => {
-
-        const option =
-          document.createElement(
-            'option'
-          );
-
-
-        option.value =
-          period.periodId ||
-          '';
-
-
-        const periodId =
-          period.periodId ||
-          '';
-
-
-        const startDate =
-          period.startDate ||
-          '';
-
-
-        const endDate =
-          period.endDate ||
-          '';
-
-
-        const status =
-          period.status ||
-          '';
-
-
-        option.textContent =
-          `${periodId} | ${startDate} - ${endDate} | ${status}`;
-
-
-        /*
-          เก็บข้อมูลไว้ด้วย
-          เผื่อใช้แสดงรายละเอียด
-        */
-
-        option.dataset.startDate =
-          startDate;
-
-
-        option.dataset.endDate =
-          endDate;
-
-
-        option.dataset.payDate =
-          period.payDate ||
-          '';
-
-
-        option.dataset.status =
-          status;
-
-
-        option.dataset.remark =
-          period.remark ||
-          '';
-
-
-        select.appendChild(
-          option
-        );
-
-      }
-    );
-
-
-    $('periodInfo')
-      .innerHTML =
-      '';
-
-
-    clearMessage();
-
-
-  }catch(error){
-
-    console.error(
-      'PAYROLL PERIOD ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+    const d=await api('LIST_PAYROLL_PERIODS');periods=d.data||[];
+    const html=periods.map(p=>'<option value="'+esc(p.periodId)+'">'+esc(p.periodId+' · '+p.startDate+' → '+p.endDate+' · '+p.status)+'</option>').join('');
+    ['periodSelect','slipPeriod'].forEach(id=>$(id).innerHTML=html||'<option value="">ไม่มี Payroll Period</option>');
+    if(periods.length){$('periodSelect').value=periods[periods.length-1].periodId;$('slipPeriod').value=periods[periods.length-1].periodId}
+    updatePeriodInfo();
+  }catch(e){flash(e.message,'error')}
 }
-
-
-
-/* =====================================================
-   PERIOD CHANGE
-   ===================================================== */
-
-$('period')
-  .addEventListener(
-    'change',
-    function(){
-
-      const option =
-        this.options[
-          this.selectedIndex
-        ];
-
-
-      if(
-        !option ||
-        !option.value
-      ){
-
-        $('periodInfo')
-          .innerHTML =
-          '';
-
-        return;
-
-      }
-
-
-      const status =
-        option.dataset.status ||
-        '';
-
-
-      const statusClass =
-        status === 'Paid'
-          ? 'green'
-          : '';
-
-
-      $('periodInfo')
-        .innerHTML = `
-
-          <div class="info-box">
-
-            <b>
-              Payroll Period
-            </b>
-
-            <div style="margin-top:8px">
-
-              <strong>
-                ${esc(
-                  option.value
-                )}
-              </strong>
-
-            </div>
-
-            <div
-              class="muted"
-              style="margin-top:6px">
-
-              ${esc(
-                option.dataset.startDate ||
-                ''
-              )}
-
-              -
-
-              ${esc(
-                option.dataset.endDate ||
-                ''
-              )}
-
-            </div>
-
-            <div
-              style="margin-top:8px">
-
-              Status:
-
-              <span
-                class="period-status">
-
-                ${esc(
-                  status ||
-                  '-'
-                )}
-
-              </span>
-
-            </div>
-
-            <div
-              class="muted"
-              style="margin-top:6px">
-
-              Pay Date:
-
-              ${esc(
-                option.dataset.payDate ||
-                '-'
-              )}
-
-            </div>
-
-          </div>
-
-        `;
-
-    }
-  );
-
-
-
-/* =====================================================
-   PAYROLL
-   ===================================================== */
-
+$('periodSelect').addEventListener('change',()=>{updatePeriodInfo();loadPayroll()});
+$('slipPeriod').addEventListener('change',()=>{loadPayslipSetup()});
+function updatePeriodInfo(){
+  const p=periods.find(x=>x.periodId===$('periodSelect').value);
+  if(!p){$('periodInfo').textContent='ไม่มีข้อมูลงวด';return}
+  $('periodInfo').textContent=`${p.periodId} · ${p.startDate} ถึง ${p.endDate} · Pay date ${p.payDate} · Status ${p.status}`;
+}
 async function loadPayroll(){
-
   try{
-
-    const period =
-      $('period')
-        .value
-        .trim();
-
-
-    if(!period){
-
-      showError(
-        'กรุณาเลือก Payroll Period'
-      );
-
-      return;
-
-    }
-
-
-    showLoading(
-      'กำลังโหลด Payroll...'
-    );
-
-
-    const d =
-      await api(
-        'PAYROLL',
-        {
-          periodId:
-            period
-        }
-      );
-
-
-    let html =
-      table(
-        d.data ||
-        [],
-
-        [
-          'payrollId',
-          'periodId',
-          'employeeId',
-          'name',
-          'basePay',
-          'otPay',
-          'holidayPay',
-          'positionAllowance',
-          'attendanceBonus',
-          'incentive',
-          'otherEarning',
-          'deduction',
-          'netPay',
-          'status'
-        ]
-      );
-
-
-    /*
-      SUPER_ADMIN
-      สามารถ Approve / Paid
-    */
-
-    if(
-      role === 'SUPER_ADMIN'
-    ){
-
-      html = `
-
-        <div
-          class="info-box">
-
-          <div
-            class="button-row">
-
-            <button
-              class="action green"
-              onclick="approve()">
-
-              ✅ Approve Payroll
-
-            </button>
-
-
-            <button
-              class="action"
-              onclick="paid()">
-
-              💵 Mark as Paid
-
-            </button>
-
-          </div>
-
-          <div class="muted">
-
-            เฉพาะ SUPER_ADMIN
-            สามารถ Approve และ Mark as Paid
-
-          </div>
-
-        </div>
-
-      ` + html;
-
-    }
-
-
-    $('payTable')
-      .innerHTML =
-      html;
-
-
-    clearMessage();
-
-
-  }catch(error){
-
-    console.error(
-      'PAYROLL ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+    const periodId=$('periodSelect').value;if(!periodId)return;
+    const d=await api('PAYROLL',{periodId});currentPayroll=d.data||[];
+    const total=currentPayroll.reduce((a,r)=>a+Number(r.netPay||0),0);
+    const gross=currentPayroll.reduce((a,r)=>a+Number(r.basePay||0)+Number(r.otPay||0)+Number(r.holidayPay||0)+Number(r.positionAllowance||0)+Number(r.attendanceBonus||0)+Number(r.incentive||0)+Number(r.otherEarning||0),0);
+    $('payStats').innerHTML='<div class="statbox">Employees<b>'+currentPayroll.length+'</b></div><div class="statbox">Gross<b>'+money(gross)+' ฿</b></div><div class="statbox">Net Pay<b>'+money(total)+' ฿</b></div>';
+    const statuses=[...new Set(currentPayroll.map(r=>r.status).filter(Boolean))];
+    $('payActions').innerHTML=(role==='SUPER_ADMIN'?'<button class="btn green" onclick="approvePayroll()">✓ Approve Payroll</button><button class="btn blue" onclick="markPaid()">💵 Mark as Paid</button>':'<span class="notice" style="margin:0">ADMIN: ตรวจ/แก้ข้อมูล/คำนวณได้ แต่ Approve และ Paid ทำได้โดย SUPER_ADMIN</span>')+'<button class="btn secondary" onclick="recalculate()">🧮 Recalculate</button>';
+    $('payTable').innerHTML=table(currentPayroll,['employeeId','name','type','basePay','otPay','holidayPay','positionAllowance','attendanceBonus','incentive','otherEarning','deduction','netPay','status'],{labels:{employeeId:'ID',name:'Name',type:'Type',basePay:'Base',otPay:'OT',holidayPay:'Holiday',positionAllowance:'Position',attendanceBonus:'Attendance',incentive:'Incentive',otherEarning:'Other',deduction:'Deduction',netPay:'Net',status:'Status'},cell:(r,c)=>['basePay','otPay','holidayPay','positionAllowance','attendanceBonus','incentive','otherEarning','deduction','netPay'].includes(c)?money(r[c]):c==='status'?statusBadge(r[c]):esc(r[c])});
+    updateSlipEmployees();
+  }catch(e){flash(e.message,'error')}
+}
+async function recalculate(){
+  try{const periodId=$('periodSelect').value;await api('RECALCULATE_PAYROLL',{periodId,reason:'Admin Panel V2 Recalculate'});flash('Recalculate Payroll สำเร็จ');await loadPayroll();await refreshDashboard()}catch(e){flash(e.message,'error')}
+}
+async function approvePayroll(){
+  if(!confirm('ยืนยัน Approve Payroll งวด '+$('periodSelect').value+' ?'))return;
+  try{await api('APPROVE_PAYROLL',{periodId:$('periodSelect').value,reason:'SUPER_ADMIN Approval'});flash('Approve Payroll สำเร็จ');loadPayroll()}catch(e){flash(e.message,'error')}
+}
+async function markPaid(){
+  const ref=prompt('Payment Ref / เลขอ้างอิงการจ่าย (ถ้ามี):','');
+  if(ref===null)return;
+  if(!confirm('ยืนยัน Mark as Paid งวด '+$('periodSelect').value+' ?'))return;
+  try{await api('MARK_PAID',{periodId:$('periodSelect').value,paymentRef:ref,reason:'SUPER_ADMIN Mark Paid'});flash('Mark as Paid สำเร็จ');loadPayroll()}catch(e){flash(e.message,'error')}
 }
 
-
-
-/* =====================================================
-   RECALCULATE PAYROLL
-   ===================================================== */
-
-async function recalculatePayroll(){
-
+async function loadAdjustments(){
+  try{const d=await api('LIST_ADJUSTMENTS',{limit:100});$('adjTable').innerHTML=table(d.data||[],['date','employeeId','name','category','description','kind','amount','status','note'],{labels:{date:'Date',employeeId:'ID',name:'Name',category:'Category',description:'Description',kind:'Kind',amount:'Amount',status:'Status',note:'Note'},cell:(r,c)=>c==='amount'?money(r[c]):c==='status'?statusBadge(r[c]):esc(r[c])})}catch(e){flash(e.message,'error')}
+}
+async function saveAdjustment(){
   try{
-
-    const period =
-      $('period')
-        .value
-        .trim();
-
-
-    if(!period){
-
-      showError(
-        'กรุณาเลือก Payroll Period ก่อน Recalculate'
-      );
-
-      return;
-
-    }
-
-
-    const confirmed =
-      window.confirm(
-        `ต้องการ Recalculate Payroll งวด ${period} ใช่หรือไม่?`
-      );
-
-
-    if(!confirmed){
-
-      return;
-
-    }
-
-
-    showLoading(
-      `กำลัง Recalculate ${period}...`
-    );
-
-
-    const d =
-      await api(
-        'RECALCULATE_PAYROLL',
-        {
-          periodId:
-            period
-        }
-      );
-
-
-    showSuccess(
-      d.message ||
-      `Recalculate ${period} สำเร็จ`
-    );
-
-
-    await loadPayroll();
-
-
-  }catch(error){
-
-    console.error(
-      'RECALCULATE ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+    const emp=employees.find(e=>e.employeeId===$('adjEmp').value);
+    await api('SAVE_ADJUSTMENT',{date:$('adjDate').value,employeeId:emp?.employeeId||'',name:emp?.name||'',category:$('adjCategory').value.trim(),description:$('adjDescription').value.trim(),kind:$('adjKind').value,amount:$('adjAmount').value,status:$('adjStatus').value,note:$('adjNote').value.trim(),reason:'Admin Panel V2'});
+    flash('บันทึก Adjustment แล้ว');$('adjAmount').value='';$('adjDescription').value='';$('adjNote').value='';await loadAdjustments();await loadPayroll();
+  }catch(e){flash(e.message,'error')}
 }
 
-
-
-/* =====================================================
-   APPROVE PAYROLL
-   ===================================================== */
-
-async function approve(){
-
+async function loadIncentives(){
+  try{const d=await api('LIST_INCENTIVES',{limit:100});$('incTable').innerHTML=table(d.data||[],['date','employeeId','name','description','amount','status','paidDate','year'],{labels:{date:'Date',employeeId:'ID',name:'Name',description:'Description',amount:'Amount',status:'Status',paidDate:'Paid Date',year:'Year'},cell:(r,c)=>c==='amount'?money(r[c]):c==='status'?statusBadge(r[c]):esc(r[c])})}catch(e){flash(e.message,'error')}
+}
+async function saveIncentive(){
   try{
-
-    if(
-      role !== 'SUPER_ADMIN'
-    ){
-
-      showError(
-        'เฉพาะ SUPER_ADMIN เท่านั้น'
-      );
-
-      return;
-
-    }
-
-
-    const period =
-      $('period')
-        .value
-        .trim();
-
-
-    if(!period){
-
-      showError(
-        'กรุณาเลือก Payroll Period'
-      );
-
-      return;
-
-    }
-
-
-    const confirmed =
-      window.confirm(
-        `Approve Payroll ${period} ใช่หรือไม่?`
-      );
-
-
-    if(!confirmed){
-
-      return;
-
-    }
-
-
-    showLoading(
-      `กำลัง Approve ${period}...`
-    );
-
-
-    await api(
-      'APPROVE_PAYROLL',
-      {
-
-        periodId:
-          period,
-
-        reason:
-          'Admin Panel'
-
-      }
-    );
-
-
-    showSuccess(
-      `Approve Payroll ${period} สำเร็จ`
-    );
-
-
-    await loadPayroll();
-
-
-  }catch(error){
-
-    console.error(
-      'APPROVE ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+    const emp=employees.find(e=>e.employeeId===$('incEmp').value);
+    await api('SAVE_INCENTIVE',{date:$('incDate').value,employeeId:emp?.employeeId||'',name:emp?.name||'',description:$('incDescription').value.trim(),amount:$('incAmount').value,status:$('incStatus').value,paidDate:$('incPaidDate').value,reason:'Admin Panel V2'});
+    flash('บันทึก Incentive แล้ว');$('incAmount').value='';$('incDescription').value='';$('incPaidDate').value='';await loadIncentives();await loadPayroll();
+  }catch(e){flash(e.message,'error')}
 }
 
-
-
-/* =====================================================
-   MARK PAID
-   ===================================================== */
-
-async function paid(){
-
-  try{
-
-    if(
-      role !== 'SUPER_ADMIN'
-    ){
-
-      showError(
-        'เฉพาะ SUPER_ADMIN เท่านั้น'
-      );
-
-      return;
-
-    }
-
-
-    const period =
-      $('period')
-        .value
-        .trim();
-
-
-    if(!period){
-
-      showError(
-        'กรุณาเลือก Payroll Period'
-      );
-
-      return;
-
-    }
-
-
-    const confirmed =
-      window.confirm(
-        `Mark as Paid งวด ${period} ใช่หรือไม่?`
-      );
-
-
-    if(!confirmed){
-
-      return;
-
-    }
-
-
-    showLoading(
-      `กำลัง Mark as Paid ${period}...`
-    );
-
-
-    await api(
-      'MARK_PAID',
-      {
-
-        periodId:
-          period,
-
-        paymentRef:
-          '',
-
-        reason:
-          'Admin Panel'
-
-      }
-    );
-
-
-    showSuccess(
-      `Mark as Paid ${period} สำเร็จ`
-    );
-
-
-    await loadPayroll();
-
-
-  }catch(error){
-
-    console.error(
-      'MARK PAID ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+function updateSlipEmployees(){
+  const p=$('slipPeriod').value||$('periodSelect').value;
+  const rows=currentPayroll.filter(r=>!p||r.periodId===p);
+  $('slipEmp').innerHTML='<option value="">เลือกพนักงาน</option>'+rows.map(r=>'<option value="'+esc(r.employeeId)+'">'+esc(r.employeeId+' · '+r.name)+'</option>').join('');
 }
-
-
-
-/* =====================================================
-   AUDIT LOG
-   ===================================================== */
+async function loadPayslipSetup(){const p=$('slipPeriod').value;try{const d=await api('PAYROLL',{periodId:p});currentPayroll=d.data||[];updateSlipEmployees();renderPayslip()}catch(e){flash(e.message,'error')}}
+function renderPayslip(){
+  const id=$('slipEmp').value;const r=currentPayroll.find(x=>x.employeeId===id);
+  if(!r){$('slipArea').innerHTML='<div class="empty">เลือก Employee</div>';return}
+  $('slipArea').innerHTML=`<div style="text-align:center"><h2 style="margin:0">E-CHA PAYSLIP</h2><div class="muted">${esc(r.periodId)} · Pay Date ${esc(fmtDate(r.payDate))}</div></div>
+  <hr style="border:0;border-top:1px solid #eee;margin:18px 0">
+  <div class="statrow"><div class="statbox">Employee<b>${esc(r.name)}</b><span class="muted">${esc(r.employeeId)} · ${esc(r.type)}</span></div><div class="statbox">Status<b>${esc(r.status)}</b></div><div class="statbox">Net Pay<b>${money(r.netPay)} ฿</b></div></div>
+  <table style="margin-top:18px;min-width:0"><tbody>
+  <tr><td>Base Pay</td><td style="text-align:right">${money(r.basePay)} ฿</td></tr>
+  <tr><td>OT Pay</td><td style="text-align:right">${money(r.otPay)} ฿</td></tr>
+  <tr><td>Holiday Pay</td><td style="text-align:right">${money(r.holidayPay)} ฿</td></tr>
+  <tr><td>Position Allowance</td><td style="text-align:right">${money(r.positionAllowance)} ฿</td></tr>
+  <tr><td>Attendance Bonus</td><td style="text-align:right">${money(r.attendanceBonus)} ฿</td></tr>
+  <tr><td>Incentive</td><td style="text-align:right">${money(r.incentive)} ฿</td></tr>
+  <tr><td>Other Earning</td><td style="text-align:right">${money(r.otherEarning)} ฿</td></tr>
+  <tr><td>Deduction</td><td style="text-align:right">-${money(r.deduction)} ฿</td></tr>
+  <tr style="font-weight:800"><td>NET PAY</td><td style="text-align:right">${money(r.netPay)} ฿</td></tr>
+  </tbody></table>
+  <p class="muted" style="margin-top:20px">Generated from Payroll_Monthly · Source: ${esc(r.source||'AUTO')}</p>`;
+}
 
 async function loadAudit(){
-
-  try{
-
-    showLoading(
-      'กำลังโหลด Audit Log...'
-    );
-
-
-    const d =
-      await api(
-        'AUDIT_LOG',
-        {
-          limit:
-            100
-        }
-      );
-
-
-    $('auditTable')
-      .innerHTML =
-      table(
-        d.data ||
-        [],
-
-        [
-          'timestamp',
-          'adminId',
-          'adminName',
-          'action',
-          'targetType',
-          'targetId',
-          'reason',
-          'result'
-        ]
-      );
-
-
-    clearMessage();
-
-
-  }catch(error){
-
-    console.error(
-      'AUDIT ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+  try{const d=await api('AUDIT_LOG',{limit:200});$('auditTable').innerHTML=table(d.data||[],['timestamp','adminId','adminName','action','targetType','targetId','reason','result'],{labels:{timestamp:'Time',adminId:'Admin ID',adminName:'Admin',action:'Action',targetType:'Target',targetId:'Target ID',reason:'Reason',result:'Result'},cell:(r,c)=>c==='result'?(r[c]==='SUCCESS'?'<span class="status active">SUCCESS</span>':'<span class="status pending">'+esc(r[c])+'</span>'):esc(r[c])})}catch(e){flash(e.message,'error')}
 }
-
-
-
-/* =====================================================
-   ADMINS
-   ===================================================== */
 
 async function loadAdmins(){
+  if(role!=='SUPER_ADMIN')return;
+  try{const d=await api('LIST_ADMINS');$('adminTable').innerHTML=table(d.data||[],['adminId','name','lineUserId','role','status','actions'],{labels:{adminId:'Admin ID',name:'Name',lineUserId:'LINE User ID',role:'Role',status:'Status',actions:'Actions'},cell:(r,c)=>c==='role'?'<b>'+esc(r[c])+'</b>':c==='status'?statusBadge(r[c]):c==='actions'?'<button class="btn small secondary" data-edit-admin="'+esc(r.adminId)+'">✏️ Edit</button>':esc(r[c])})}catch(e){flash(e.message,'error')}
+}
+function openAdminModal(admin=null){
+  $('modalTitle').textContent=admin?'แก้ไข Admin':'เพิ่ม Admin';
+  $('modalBody').innerHTML=`<div class="formgrid">
+    <div><label>Admin ID</label><input id="mAdminId" value="${esc(admin?.adminId||'')}"></div>
+    <div><label>Name</label><input id="mAdminName" value="${esc(admin?.name||'')}"></div>
+    <div class="full"><label>LINE User ID</label><input id="mAdminLine" value="${esc(admin?.lineUserId||'')}"></div>
+    <div><label>Role</label><select id="mAdminRole"><option>ADMIN</option><option>SUPER_ADMIN</option></select></div>
+    <div><label>Status</label><select id="mAdminStatus"><option>Active</option><option>Inactive</option></select></div>
+    <div class="full"><label>Reason</label><textarea id="mAdminReason"></textarea></div>
+  </div>`;
+  if(admin){$('mAdminRole').value=admin.role;$('mAdminStatus').value=admin.status}
+  $('modalFoot').innerHTML='<button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn blue" onclick="saveAdmin()">Save Admin</button>';
+  $('modal').classList.add('show');
+}
+$('adminTable').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-edit-admin]');if(!b)return;
+  api('LIST_ADMINS').then(d=>{const a=d.data.find(x=>x.adminId===b.dataset.editAdmin);if(a)openAdminModal(a)}).catch(x=>flash(x.message,'error'))
+});
+async function saveAdmin(){
+  try{await api('SAVE_ADMIN',{adminId:$('mAdminId').value.trim(),name:$('mAdminName').value.trim(),lineUserId:$('mAdminLine').value.trim(),role:$('mAdminRole').value,status:$('mAdminStatus').value,reason:$('mAdminReason').value.trim()});closeModal();flash('บันทึก Admin แล้ว');loadAdmins()}catch(e){flash(e.message,'error')}
+}
 
+async function loadSettings(){
+  if(role!=='SUPER_ADMIN')return;
   try{
+    const d=await api('LIST_SETTINGS');
+    $('settingsTable').innerHTML=table(d.data||[],['parameter','value','description'],{labels:{parameter:'Parameter',value:'Value',description:'Description'},cell:(r,c)=>c==='value'?'<input class="setting-input" data-key="'+esc(r.parameter)+'" value="'+esc(r.value)+'">':esc(r[c])});
 
-    if(
-      role !== 'SUPER_ADMIN'
-    ){
-
-      showError(
-        'เฉพาะ SUPER_ADMIN เท่านั้น'
-      );
-
-      return;
-
-    }
-
-
-    showLoading(
-      'กำลังโหลด Admins...'
-    );
-
-
-    const d =
-      await api(
-        'LIST_ADMINS'
-      );
-
-
-    $('adminTable')
-      .innerHTML =
-      table(
-        d.data ||
-        [],
-
-        [
-          'adminId',
-          'name',
-          'lineUserId',
-          'role',
-          'status'
-        ]
-      );
-
-
-    clearMessage();
-
-
-  }catch(error){
-
-    console.error(
-      'ADMINS ERROR',
-      error
-    );
-
-    showError(
-      error.message ||
-      String(error)
-    );
-
-  }
-
+  }catch(e){flash(e.message,'error')}
+}
+async function saveAllSettings(){
+  try{
+    const inputs=[...document.querySelectorAll('.setting-input')];
+    for(const input of inputs) await api('SAVE_SETTING',{parameter:input.dataset.key,value:input.value,reason:'SUPER_ADMIN Settings'});
+    flash('บันทึก System Settings แล้ว');await loadSettings();
+  }catch(e){flash(e.message,'error')}
 }
 
-
-
-/* =====================================================
-   TABLE
-   ===================================================== */
-
-function table(
-  rows,
-  columns
-){
-
-  if(
-    !Array.isArray(rows) ||
-    rows.length === 0
-  ){
-
-    return `
-
-      <div
-        style="padding:16px">
-
-        ไม่มีข้อมูล
-
-      </div>
-
-    `;
-
-  }
-
-
-  return `
-
-    <table class="table">
-
-      <thead>
-
-        <tr>
-
-          ${
-            columns
-              .map(
-                column =>
-
-                  '<th>' +
-                  esc(column) +
-                  '</th>'
-
-              )
-              .join('')
-          }
-
-        </tr>
-
-      </thead>
-
-
-      <tbody>
-
-        ${
-          rows
-            .map(
-              row => `
-
-                <tr>
-
-                  ${
-                    columns
-                      .map(
-                        column =>
-
-                          '<td>' +
-
-                          esc(
-                            row?.[column]
-                          ) +
-
-                          '</td>'
-
-                      )
-                      .join('')
-                  }
-
-                </tr>
-
-              `
-            )
-            .join('')
-        }
-
-      </tbody>
-
-    </table>
-
-  `;
-
-}
-
-
-
-/* =====================================================
-   ERROR
-   ===================================================== */
-
-function msg(error){
-
-  console.error(
-    error
-  );
-
-
-  showError(
-    error?.message ||
-    String(error)
-  );
-
-}
-
-
-
-/* =====================================================
-   START
-   ===================================================== */
+$('empTable').addEventListener('dblclick',e=>{
+  const tr=e.target.closest('tr');if(!tr)return;
+  const cells=tr.querySelectorAll('td');const id=cells[0]?.textContent?.trim();const emp=employees.find(x=>x.employeeId===id);if(emp)openEmployeeModal(emp)
+});
+$('logTable').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-log-edit]');if(!b)return;
+  const log=rawAttendanceLogs.find(x=>String(x.logId)===String(b.dataset.logEdit));
+  if(log)openAttendanceModal(log);
+});
 
 init();
-
 </script>
-
-
 </body>
-
 </html>
