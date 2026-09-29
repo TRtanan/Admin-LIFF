@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>E-CHA Admin V3</title>
+<title>E-CHA Admin V4</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root{
@@ -89,6 +89,7 @@ tr:last-child td{border-bottom:0}
     <h2>E-CHA ADMIN</h2>
     <div class="muted" id="loginStatus">กำลังยืนยันสิทธิ์ผ่าน LINE...</div>
     <div style="margin-top:18px"><span class="spinner"></span></div>
+    <div id="loginTime" class="muted" style="margin-top:10px;font-size:11px"></div>
   </div>
 </div>
 
@@ -292,30 +293,49 @@ document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>s
 async function api(action,payload={}){
   if(!accessToken) throw new Error('ไม่พบ LINE Access Token กรุณาเปิด Admin จาก Rich Menu ใหม่');
 
-  const res=await fetch(CONFIG.API_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({
-      requestType:'admin',
-      action,
-      accessToken,
-      ...payload
-    })
-  });
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),25000);
+  const t0=performance.now();
+  try{
+    const res=await fetch(CONFIG.API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({
+        requestType:'admin',
+        action,
+        accessToken,
+        // Keep idToken as compatibility fallback only.
+        idToken,
+        ...payload
+      }),
+      signal:controller.signal,
+      cache:'no-store'
+    });
 
-  const text=await res.text();
-  let d;
-  try{ d=JSON.parse(text); }
-  catch(e){ throw new Error('Apps Script ตอบกลับไม่ถูกต้อง'); }
+    const text=await res.text();
+    let d;
+    try{ d=JSON.parse(text); }
+    catch(e){ throw new Error('Apps Script ตอบกลับไม่ถูกต้อง'); }
 
-  if(!d.ok){
-    const msg=String(d.error||'API Error');
-    if(/access token.*expired|access token.*invalid|idtoken.*expired|session หมดอายุ/i.test(msg)){
-      throw new Error('LINE Session หมดอายุ กรุณาปิด Admin แล้วเปิดจาก Rich Menu ใหม่');
+    if(!d.ok){
+      const msg=String(d.error||'API Error');
+      if(/access token.*expired|access token.*invalid|idtoken.*expired|session หมดอายุ|ไม่พบ LINE Access Token/i.test(msg)){
+        throw new Error('LINE Session หมดอายุ กรุณาปิด Admin แล้วเปิดจาก Rich Menu ใหม่');
+      }
+      throw new Error(msg);
     }
-    throw new Error(msg);
+
+    // Optional diagnostics; does not affect functionality.
+    if(action==='BOOTSTRAP' && $('loginTime')){
+      $('loginTime').textContent='ตรวจสิทธิ์ + โหลดข้อมูล '+Math.round(performance.now()-t0)+' ms';
+    }
+    return d;
+  }catch(e){
+    if(e.name==='AbortError') throw new Error('เชื่อมต่อ Server ช้าเกินไป กรุณาลองใหม่');
+    throw e;
+  }finally{
+    clearTimeout(timeout);
   }
-  return d;
 }
 
 function isAuthExpiredError_(e){
@@ -338,7 +358,9 @@ function restartAdminLogin_(){
 }
 
 async function init(){
+  const initT0=performance.now();
   try{
+    $('loginStatus').textContent='กำลังเชื่อมต่อ LINE...';
     await liff.init({
       liffId:CONFIG.LIFF_ID,
       withLoginOnExternalBrowser:true
@@ -348,6 +370,7 @@ async function init(){
       throw new Error('LINE Login ยังไม่พร้อม กรุณาเปิด Admin จาก Rich Menu ใหม่');
     }
 
+    $('loginStatus').textContent='กำลังตรวจสอบสิทธิ์ Admin...';
     accessToken=liff.getAccessToken();
     if(!accessToken) throw new Error('ไม่พบ LINE Access Token');
 
@@ -356,6 +379,7 @@ async function init(){
     // Bootstrap dashboard + employees + payroll periods in one request.
     // This removes two round-trips during initial load.
     const d=await api('BOOTSTRAP');
+    if($('loginTime')) $('loginTime').textContent='เปิด Admin สำเร็จ · '+Math.round(performance.now()-initT0)+' ms';
 
     role=d.role;
     adminName=d.adminName||'Admin';
@@ -410,6 +434,7 @@ async function init(){
     }
 
     $('loginStatus').textContent=e.message||String(e);
+    if($('loginTime')) $('loginTime').textContent='ใช้เวลา '+Math.round(performance.now()-initT0)+' ms';
     $('loginBox').querySelector('.spinner').style.display='none';
   }
 }
