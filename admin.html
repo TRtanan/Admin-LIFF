@@ -353,7 +353,9 @@ async function init(){
 
     idToken=liff.getIDToken()||'';
 
-    const d=await api('DASHBOARD');
+    // Bootstrap dashboard + employees + payroll periods in one request.
+    // This removes two round-trips during initial load.
+    const d=await api('BOOTSTRAP');
 
     role=d.role;
     adminName=d.adminName||'Admin';
@@ -372,9 +374,22 @@ async function init(){
     $('adjDate').value=today();
     $('incDate').value=today();
 
-    await loadEmployees();
-    await loadPeriods();
-    renderDashboard(d.data);
+    // Use the bootstrap payload instead of making 2 additional API calls.
+    employees=d.data?.employees||[];
+    periods=d.data?.periods||[];
+
+    $('empTable').innerHTML=table(employees,['employeeId','name','type','position','salaryRate','offDays','positionAllowance','attendanceBonus','lineUserId','bankAccount','status','actions'],{
+      labels:{employeeId:'ID',name:'Name',type:'Type',position:'Position',salaryRate:'Rate',offDays:'Off',positionAllowance:'Position',attendanceBonus:'Attendance',lineUserId:'LINE User ID',bankAccount:'Bank',status:'Status',actions:'Actions'},
+      cell:(r,c)=>c==='salaryRate'||c==='positionAllowance'||c==='attendanceBonus'?money(r[c]):c==='status'?statusBadge(r[c]):c==='actions'?'<button class=\"btn small secondary\" data-edit-emp=\"'+esc(r.employeeId)+'\">✏️ Edit</button>':esc(r[c])
+    });
+    fillEmployeeSelects();
+
+    const periodHtml=periods.map(p=>'<option value=\"'+esc(p.periodId)+'\">'+esc(p.periodId+' · '+p.startDate+' → '+p.endDate+' · '+p.status)+'</option>').join('');
+    ['periodSelect','slipPeriod'].forEach(id=>$(id).innerHTML=periodHtml||'<option value=\"\">ไม่มี Payroll Period</option>');
+    if(periods.length){$('periodSelect').value=periods[periods.length-1].periodId;$('slipPeriod').value=periods[periods.length-1].periodId}
+    updatePeriodInfo();
+
+    renderDashboard(d.data?.dashboard);
     setSection('dashboard');
 
   }catch(e){
