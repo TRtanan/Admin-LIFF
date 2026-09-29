@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>E-CHA Admin V2</title>
+<title>E-CHA Admin V3</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root{
@@ -267,7 +267,7 @@ const CONFIG={
   LIFF_ID:'2011734616-wit93kJp',
   API_URL:'https://script.google.com/macros/s/AKfycbyBPYGNYSEEGkAGhIAzLBHXsEukhJR8QRfphmuR9pVdiOgt3V909tbePSuMuSFlCLUHJw/exec'
 };
-let idToken='', role='', adminName='', currentPayroll=[], employees=[], periods=[];
+let idToken='', accessToken='', role='', adminName='', currentPayroll=[], employees=[], periods=[];
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -290,30 +290,110 @@ function setSection(id){
 document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>setSection(b.dataset.section)));
 
 async function api(action,payload={}){
-  const res=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({requestType:'admin',action,idToken,...payload})});
-  const d=await res.json();
-  if(!d.ok) throw new Error(d.error||'API Error');
+  if(!accessToken) throw new Error('ไม่พบ LINE Access Token กรุณาเปิด Admin จาก Rich Menu ใหม่');
+
+  const res=await fetch(CONFIG.API_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({
+      requestType:'admin',
+      action,
+      accessToken,
+      ...payload
+    })
+  });
+
+  const text=await res.text();
+  let d;
+  try{ d=JSON.parse(text); }
+  catch(e){ throw new Error('Apps Script ตอบกลับไม่ถูกต้อง'); }
+
+  if(!d.ok){
+    const msg=String(d.error||'API Error');
+    if(/access token.*expired|access token.*invalid|idtoken.*expired|session หมดอายุ/i.test(msg)){
+      throw new Error('LINE Session หมดอายุ กรุณาปิด Admin แล้วเปิดจาก Rich Menu ใหม่');
+    }
+    throw new Error(msg);
+  }
   return d;
+}
+
+function isAuthExpiredError_(e){
+  const msg=String((e&&e.message)||e||'').toLowerCase();
+  const code=String((e&&e.code)||'').toUpperCase();
+  return code==='UNAUTHORIZED' ||
+         msg.includes('access token expired') ||
+         msg.includes('access token invalid') ||
+         msg.includes('idtoken expired') ||
+         msg.includes('token expired') ||
+         msg.includes('session หมดอายุ');
+}
+
+function restartAdminLogin_(){
+  try{sessionStorage.setItem('ECHA_ADMIN_REAUTH','1');}catch(e){}
+  try{if(liff.isLoggedIn())liff.logout();}catch(e){}
+  setTimeout(()=>{
+    window.location.replace('https://liff.line.me/'+CONFIG.LIFF_ID);
+  },300);
 }
 
 async function init(){
   try{
-    await liff.init({liffId:CONFIG.LIFF_ID});
-    if(!liff.isLoggedIn()){liff.login();return}
-    idToken=liff.getIDToken();
-    if(!idToken) throw new Error('ไม่พบ LINE ID Token');
+    await liff.init({
+      liffId:CONFIG.LIFF_ID,
+      withLoginOnExternalBrowser:true
+    });
+
+    if(!liff.isLoggedIn()){
+      throw new Error('LINE Login ยังไม่พร้อม กรุณาเปิด Admin จาก Rich Menu ใหม่');
+    }
+
+    accessToken=liff.getAccessToken();
+    if(!accessToken) throw new Error('ไม่พบ LINE Access Token');
+
+    idToken=liff.getIDToken()||'';
+
     const d=await api('DASHBOARD');
-    role=d.role; adminName=d.adminName||'Admin';
+
+    role=d.role;
+    adminName=d.adminName||'Admin';
+
     $('adminName').textContent=adminName;
     $('roleBadge').textContent=role;
-    document.querySelectorAll('.admin-only,.super-only,.super-only-section').forEach(el=>el.style.display=role==='SUPER_ADMIN'?'':'none');
+
+    document.querySelectorAll('.admin-only,.super-only,.super-only-section')
+      .forEach(el=>el.style.display=role==='SUPER_ADMIN'?'':'none');
+
     $('loginBox').style.display='none';
-    $('attDate').value=today(); $('adjDate').value=today(); $('incDate').value=today();
+
+    try{sessionStorage.removeItem('ECHA_ADMIN_REAUTH');}catch(e){}
+
+    $('attDate').value=today();
+    $('adjDate').value=today();
+    $('incDate').value=today();
+
     await loadEmployees();
     await loadPeriods();
     renderDashboard(d.data);
     setSection('dashboard');
+
   }catch(e){
+    console.error('Admin LIFF init/auth error:',e);
+
+    if(isAuthExpiredError_(e)){
+      let alreadyRetried=false;
+      try{
+        alreadyRetried=sessionStorage.getItem('ECHA_ADMIN_REAUTH')==='1';
+      }catch(x){}
+
+      if(!alreadyRetried){
+        $('loginStatus').textContent='กำลังต่ออายุ LINE Session...';
+        $('loginBox').querySelector('.spinner').style.display='inline-block';
+        restartAdminLogin_();
+        return;
+      }
+    }
+
     $('loginStatus').textContent=e.message||String(e);
     $('loginBox').querySelector('.spinner').style.display='none';
   }
