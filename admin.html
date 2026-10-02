@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>E-CHA Admin V5</title>
+<title>E-CHA Admin V5.1</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root{
@@ -297,7 +297,7 @@ async function api(action,payload={}){
   const timeout=setTimeout(()=>controller.abort(),25000);
   const t0=performance.now();
   try{
-    const body={requestType:'admin',action,accessToken,idToken,...payload};
+    const body={requestType:'admin',accessToken,idToken,...payload,action};
     const res=await fetch(CONFIG.API_URL,{
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -505,7 +505,7 @@ async function saveAttendanceModal(log){
   const btn=event?.currentTarget;
   try{
     await withSaveState_(btn,'กำลังบันทึก...',async()=>{
-      const p={employeeId:$('mAttEmp').value,date:$('mAttDate').value,time:$('mAttTime').value,action:$('mAttAction').value,reason:$('mAttReason').value.trim()};
+      const p={employeeId:$('mAttEmp').value,date:$('mAttDate').value,time:$('mAttTime').value,attendanceAction:$('mAttAction').value,reason:$('mAttReason').value.trim()};
       if(log){p.logId=log.logId;p.timestamp=p.date+'T'+p.time+':00+07:00';await api('EDIT_ATTENDANCE',p)}
       else await api('ADD_ATTENDANCE_LOG',p);
       closeModal();flash('บันทึก Attendance แล้ว');await loadAttendance();await refreshDashboard();
