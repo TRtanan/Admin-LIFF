@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>E-CHA Admin V4</title>
+<title>E-CHA Admin V5</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root{
@@ -297,25 +297,25 @@ async function api(action,payload={}){
   const timeout=setTimeout(()=>controller.abort(),25000);
   const t0=performance.now();
   try{
+    const body={requestType:'admin',action,accessToken,idToken,...payload};
     const res=await fetch(CONFIG.API_URL,{
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({
-        requestType:'admin',
-        action,
-        accessToken,
-        // Keep idToken as compatibility fallback only.
-        idToken,
-        ...payload
-      }),
+      body:JSON.stringify(body),
       signal:controller.signal,
-      cache:'no-store'
+      cache:'no-store',
+      redirect:'follow'
     });
 
     const text=await res.text();
     let d;
     try{ d=JSON.parse(text); }
-    catch(e){ throw new Error('Apps Script ตอบกลับไม่ถูกต้อง'); }
+    catch(e){
+      console.error('[ECHA API] Non-JSON response',action,res.status,res.url,text.slice(0,1000));
+      throw new Error('Apps Script ตอบกลับไม่ถูกต้อง (HTTP '+res.status+')');
+    }
+
+    console.log('[ECHA API]',action,d);
 
     if(!d.ok){
       const msg=String(d.error||'API Error');
@@ -325,16 +325,32 @@ async function api(action,payload={}){
       throw new Error(msg);
     }
 
-    // Optional diagnostics; does not affect functionality.
     if(action==='BOOTSTRAP' && $('loginTime')){
       $('loginTime').textContent='ตรวจสิทธิ์ + โหลดข้อมูล '+Math.round(performance.now()-t0)+' ms';
     }
     return d;
   }catch(e){
+    console.error('[ECHA API ERROR]',action,e);
     if(e.name==='AbortError') throw new Error('เชื่อมต่อ Server ช้าเกินไป กรุณาลองใหม่');
     throw e;
   }finally{
     clearTimeout(timeout);
+  }
+}
+
+async function withSaveState_(button,busyText,fn){
+  if(button?.dataset.busy==='1') return;
+  const old=button?.innerHTML;
+  if(button){button.dataset.busy='1';button.disabled=true;button.innerHTML=busyText||'กำลังบันทึก...';}
+  try{
+    return await fn();
+  }catch(e){
+    const msg=String(e?.message||e||'บันทึกไม่สำเร็จ');
+    flash(msg,'error');
+    alert('บันทึกไม่สำเร็จ\n\n'+msg);
+    throw e;
+  }finally{
+    if(button){button.dataset.busy='';button.disabled=false;button.innerHTML=old||'Save';}
   }
 }
 
@@ -486,11 +502,15 @@ function openAttendanceModal(log=null){
 function employeeIdFromLog(log){const e=employees.find(x=>String(x.lineUserId||'')===String(log.lineUserId||''));return e?.employeeId||''}
 function editLog(log){openAttendanceModal(log)}
 async function saveAttendanceModal(log){
+  const btn=event?.currentTarget;
   try{
-    const p={employeeId:$('mAttEmp').value,date:$('mAttDate').value,time:$('mAttTime').value,action:$('mAttAction').value,reason:$('mAttReason').value.trim()};
-    if(log){p.logId=log.logId;p.timestamp=p.date+'T'+p.time+':00+07:00';await api('EDIT_ATTENDANCE',p)}else await api('ADD_ATTENDANCE_LOG',p);
-    closeModal();flash('บันทึก Attendance แล้ว');await loadAttendance();await refreshDashboard();
-  }catch(e){flash(e.message,'error')}
+    await withSaveState_(btn,'กำลังบันทึก...',async()=>{
+      const p={employeeId:$('mAttEmp').value,date:$('mAttDate').value,time:$('mAttTime').value,action:$('mAttAction').value,reason:$('mAttReason').value.trim()};
+      if(log){p.logId=log.logId;p.timestamp=p.date+'T'+p.time+':00+07:00';await api('EDIT_ATTENDANCE',p)}
+      else await api('ADD_ATTENDANCE_LOG',p);
+      closeModal();flash('บันทึก Attendance แล้ว');await loadAttendance();await refreshDashboard();
+    });
+  }catch(e){}
 }
 function closeModal(){$('modal').classList.remove('show')}
 
@@ -534,10 +554,13 @@ $('empTable').addEventListener('click',e=>{
   const emp=employees.find(x=>x.employeeId===b.dataset.editEmp);if(emp)openEmployeeModal(emp);
 });
 async function saveEmployee(){
+  const btn=event?.currentTarget;
   try{
-    const p={employeeId:$('mEmpId').value.trim(),name:$('mEmpName').value.trim(),type:$('mEmpType').value,position:$('mEmpPosition').value.trim(),salaryRate:$('mEmpRate').value,offDays:$('mEmpOff').value,positionAllowance:$('mEmpPos').value,attendanceBonus:$('mEmpAtt').value,lineUserId:$('mEmpLine').value.trim(),bankAccount:$('mEmpBank').value.trim(),status:$('mEmpStatus').value,reason:$('mEmpReason').value.trim()};
-    await api('SAVE_EMPLOYEE',p);closeModal();flash('บันทึก Employee แล้ว');loadEmployees();
-  }catch(e){flash(e.message,'error')}
+    await withSaveState_(btn,'กำลังบันทึก...',async()=>{
+      const p={employeeId:$('mEmpId').value.trim(),name:$('mEmpName').value.trim(),type:$('mEmpType').value,position:$('mEmpPosition').value.trim(),salaryRate:$('mEmpRate').value,offDays:$('mEmpOff').value,positionAllowance:$('mEmpPos').value,attendanceBonus:$('mEmpAtt').value,lineUserId:$('mEmpLine').value.trim(),bankAccount:$('mEmpBank').value.trim(),status:$('mEmpStatus').value,reason:$('mEmpReason').value.trim()};
+      await api('SAVE_EMPLOYEE',p);closeModal();flash('บันทึก Employee แล้ว');await loadEmployees();
+    });
+  }catch(e){}
 }
 
 async function loadPeriods(){
@@ -587,22 +610,28 @@ async function loadAdjustments(){
   try{const d=await api('LIST_ADJUSTMENTS',{limit:100});$('adjTable').innerHTML=table(d.data||[],['date','employeeId','name','category','description','kind','amount','status','note'],{labels:{date:'Date',employeeId:'ID',name:'Name',category:'Category',description:'Description',kind:'Kind',amount:'Amount',status:'Status',note:'Note'},cell:(r,c)=>c==='amount'?money(r[c]):c==='status'?statusBadge(r[c]):esc(r[c])})}catch(e){flash(e.message,'error')}
 }
 async function saveAdjustment(){
+  const btn=event?.currentTarget;
   try{
-    const emp=employees.find(e=>e.employeeId===$('adjEmp').value);
-    await api('SAVE_ADJUSTMENT',{date:$('adjDate').value,employeeId:emp?.employeeId||'',name:emp?.name||'',category:$('adjCategory').value.trim(),description:$('adjDescription').value.trim(),kind:$('adjKind').value,amount:$('adjAmount').value,status:$('adjStatus').value,note:$('adjNote').value.trim(),reason:'Admin Panel V2'});
-    flash('บันทึก Adjustment แล้ว');$('adjAmount').value='';$('adjDescription').value='';$('adjNote').value='';await loadAdjustments();await loadPayroll();
-  }catch(e){flash(e.message,'error')}
+    await withSaveState_(btn,'กำลังบันทึก...',async()=>{
+      const emp=employees.find(e=>e.employeeId===$('adjEmp').value);
+      await api('SAVE_ADJUSTMENT',{date:$('adjDate').value,employeeId:emp?.employeeId||'',name:emp?.name||'',category:$('adjCategory').value.trim(),description:$('adjDescription').value.trim(),kind:$('adjKind').value,amount:$('adjAmount').value,status:$('adjStatus').value,note:$('adjNote').value.trim(),reason:'Admin Panel V2'});
+      flash('บันทึก Adjustment แล้ว');$('adjAmount').value='';$('adjDescription').value='';$('adjNote').value='';await loadAdjustments();await loadPayroll();
+    });
+  }catch(e){}
 }
 
 async function loadIncentives(){
   try{const d=await api('LIST_INCENTIVES',{limit:100});$('incTable').innerHTML=table(d.data||[],['date','employeeId','name','description','amount','status','paidDate','year'],{labels:{date:'Date',employeeId:'ID',name:'Name',description:'Description',amount:'Amount',status:'Status',paidDate:'Paid Date',year:'Year'},cell:(r,c)=>c==='amount'?money(r[c]):c==='status'?statusBadge(r[c]):esc(r[c])})}catch(e){flash(e.message,'error')}
 }
 async function saveIncentive(){
+  const btn=event?.currentTarget;
   try{
-    const emp=employees.find(e=>e.employeeId===$('incEmp').value);
-    await api('SAVE_INCENTIVE',{date:$('incDate').value,employeeId:emp?.employeeId||'',name:emp?.name||'',description:$('incDescription').value.trim(),amount:$('incAmount').value,status:$('incStatus').value,paidDate:$('incPaidDate').value,reason:'Admin Panel V2'});
-    flash('บันทึก Incentive แล้ว');$('incAmount').value='';$('incDescription').value='';$('incPaidDate').value='';await loadIncentives();await loadPayroll();
-  }catch(e){flash(e.message,'error')}
+    await withSaveState_(btn,'กำลังบันทึก...',async()=>{
+      const emp=employees.find(e=>e.employeeId===$('incEmp').value);
+      await api('SAVE_INCENTIVE',{date:$('incDate').value,employeeId:emp?.employeeId||'',name:emp?.name||'',description:$('incDescription').value.trim(),amount:$('incAmount').value,status:$('incStatus').value,paidDate:$('incPaidDate').value,reason:'Admin Panel V2'});
+      flash('บันทึก Incentive แล้ว');$('incAmount').value='';$('incDescription').value='';$('incPaidDate').value='';await loadIncentives();await loadPayroll();
+    });
+  }catch(e){}
 }
 
 function updateSlipEmployees(){
@@ -658,7 +687,13 @@ $('adminTable').addEventListener('click',e=>{
   api('LIST_ADMINS').then(d=>{const a=d.data.find(x=>x.adminId===b.dataset.editAdmin);if(a)openAdminModal(a)}).catch(x=>flash(x.message,'error'))
 });
 async function saveAdmin(){
-  try{await api('SAVE_ADMIN',{adminId:$('mAdminId').value.trim(),name:$('mAdminName').value.trim(),lineUserId:$('mAdminLine').value.trim(),role:$('mAdminRole').value,status:$('mAdminStatus').value,reason:$('mAdminReason').value.trim()});closeModal();flash('บันทึก Admin แล้ว');loadAdmins()}catch(e){flash(e.message,'error')}
+  const btn=event?.currentTarget;
+  try{
+    await withSaveState_(btn,'กำลังบันทึก...',async()=>{
+      await api('SAVE_ADMIN',{adminId:$('mAdminId').value.trim(),name:$('mAdminName').value.trim(),lineUserId:$('mAdminLine').value.trim(),role:$('mAdminRole').value,status:$('mAdminStatus').value,reason:$('mAdminReason').value.trim()});
+      closeModal();flash('บันทึก Admin แล้ว');await loadAdmins();
+    });
+  }catch(e){}
 }
 
 async function loadSettings(){
